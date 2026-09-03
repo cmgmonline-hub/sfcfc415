@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>City Mission · 城市使命四方福音會</title>
+<meta name="description" content="City Mission — SF Chinese Foursquare Church. A Chinese-speaking church in San Francisco, gathering to worship, grow, and serve the city together.">
+<link rel="icon" href="assets/SFCFC-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Hero graphic: gentle floating nodes + flowing signal lines (gold/cyan) */
+  .hero__net-lines line{
+    stroke-dasharray: 8 10;
+    animation: net-flow 1.4s linear infinite;
+  }
+  @keyframes net-flow{ to{ stroke-dashoffset: -36; } }
+
+  .hero__net-nodes circle{
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: node-float 2.2s ease-in-out infinite, node-pulse 1.4s ease-in-out infinite;
+  }
+  .hero__net-nodes circle:nth-child(1){ animation-delay: 0s, 0s; }
+  .hero__net-nodes circle:nth-child(2){ animation-delay: 0.2s, 0.15s; }
+  .hero__net-nodes circle:nth-child(3){ animation-delay: 0.4s, 0.3s; }
+  .hero__net-nodes circle:nth-child(4){ animation-delay: 0.6s, 0.45s; }
+  .hero__net-nodes circle:nth-child(5){ animation-delay: 0.8s, 0.6s; }
+  .hero__net-nodes circle:nth-child(6){ animation-delay: 1.0s, 0.75s; }
+  .hero__net-nodes circle:nth-child(7){ animation-delay: 1.2s, 0.9s; }
+  .hero__net-nodes circle:nth-child(8){ animation-delay: 1.4s, 1.05s; }
+  .hero__net-nodes circle:nth-child(9){ animation-delay: 1.6s, 1.2s; }
+  @keyframes node-float{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-16px); } }
+  @keyframes node-pulse{ 0%,100%{ opacity: 0.45; } 50%{ opacity: 1; } }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<header class="nav" id="top">
+  <a class="nav__brand" href="#top">
+    <img src="assets/SFCFC-logo.png" alt="City Mission logo" class="nav__logo">
+    <span class="nav__brand-text">
+      <span class="nav__en">City Mission</span>
+      <span class="nav__zh">城市使命四方福音會</span>
+    </span>
+  </a>
+  <nav class="nav__links">
+    <a href="#mission">About <span style="opacity:0.6;font-size:0.85em;">關於我們</span></a>
+    <a href="#pillars">Ministries <span style="opacity:0.6;font-size:0.85em;">事工</span></a>
+    <a href="#path">Get Connected <span style="opacity:0.6;font-size:0.85em;">成長之路</span></a>
+    <a href="#events">Service Times <span style="opacity:0.6;font-size:0.85em;">崇拜時間</span></a>
+    <a href="#join" class="nav__cta">Connect 聯絡我們</a>
+  </nav>
+  <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <svg class="hero__net" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g class="hero__net-lines">
+        <line x1="120" y1="140" x2="300" y2="230"></line>
+        <line x1="300" y1="230" x2="470" y2="120"></line>
+        <line x1="470" y1="120" x2="640" y2="260"></line>
+        <line x1="640" y1="260" x2="860" y2="150"></line>
+        <line x1="860" y1="150" x2="1040" y2="270"></line>
+        <line x1="300" y1="230" x2="360" y2="420"></line>
+        <line x1="640" y1="260" x2="700" y2="470"></line>
+        <line x1="860" y1="150" x2="960" y2="380"></line>
+      </g>
+      <g class="hero__net-nodes">
+        <circle cx="120" cy="140" r="5"></circle>
+        <circle cx="300" cy="230" r="7"></circle>
+        <circle cx="470" cy="120" r="5"></circle>
+        <circle cx="640" cy="260" r="7"></circle>
+        <circle cx="860" cy="150" r="6"></circle>
+        <circle cx="1040" cy="270" r="5"></circle>
+        <circle cx="360" cy="420" r="4"></circle>
+        <circle cx="700" cy="470" r="4"></circle>
+        <circle cx="960" cy="380" r="4"></circle>
+      </g>
+    </svg>
+
+    <div class="hero__content">
+      <p class="eyebrow">城市使命四方福音會 · SF Chinese Foursquare Church · Est. 2007</p>
+      <h1 class="hero__title">
+        The city is <span class="grad">our mission field</span>.
+        <span style="display:block;margin-top:10px;font-size:0.55em;opacity:0.75;font-family:'Noto Sans TC',sans-serif;font-weight:500;">城市，是我們的禾場。</span>
+      </h1>
+      <p class="hero__sub">
+        A Chinese-speaking church in San Francisco, gathering to worship, grow, and serve this city together.
+        <span style="display:block;margin-top:8px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">一間扎根三藩市的華人教會，一同敬拜、成長，並服事這座城市。</span>
+      </p>
+      <div class="hero__actions">
+        <a href="#events" class="btn btn--primary">Join us Sunday 主日與我們相聚</a>
+        <a href="#mission" class="btn btn--ghost">Learn more 了解我們</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MISSION -->
+  <section class="mission" id="mission">
+    <div class="mission__inner">
+      <span class="section-label">01 — Why we exist 我們為何存在</span>
+      <h2 class="mission__statement">
+        Faith and city aren't supposed to live apart. <span class="mission__statement--accent">We're sent for both.</span>
+        <span style="display:block;margin-top:10px;font-size:0.6em;opacity:0.75;font-family:'Noto Sans TC',sans-serif;font-weight:500;">信仰與城市，不應該彼此分開。我們為這兩者而被差遣。</span>
+      </h2>
+      <p class="mission__body">
+        We are a Chinese-speaking congregation in San Francisco, established in 2007, committed to being a mission to this city —
+        not just a church in it. We gather to worship, to grow in faith, and to serve our neighbors in tangible, everyday ways.
+        <span style="display:block;margin-top:8px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">我們是一所扎根三藩市、於2007年成立的華人教會，委身成為這座城市的使命，而不僅僅是身處其中的一間教會。我們一同敬拜、在信仰中成長，並以實際行動服事身邊的鄰舍。</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- PILLARS / MINISTRIES -->
+  <section class="pillars" id="pillars">
+    <span class="section-label section-label--center">02 — Our ministries 我們的事工</span>
+    <h2 class="pillars__heading">Three ways we serve together
+      <span style="display:block;margin-top:8px;font-size:0.6em;opacity:0.75;font-family:'Noto Sans TC',sans-serif;font-weight:500;">三種我們一同服事的方式</span>
+    </h2>
+
+    <div class="pillars__grid">
+      <article class="pillar-card">
+        <div class="pillar-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><path d="M24 6 L24 42 M12 42 L36 42 M14 20 L34 20 M17 10 L31 10"/></svg>
+        </div>
+        <h3>Sunday Worship <span style="display:block;font-size:0.8em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">主日崇拜</span></h3>
+        <p>Join us every Sunday at 10:00am for worship in Chinese and English, as one congregation across generations.
+        <span style="display:block;margin-top:8px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">歡迎你每主日早上10:00與我們一同敬拜，跨越語言與世代，成為同一個大家庭。</span></p>
+      </article>
+
+      <article class="pillar-card">
+        <div class="pillar-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="14" cy="14" r="5"/><circle cx="34" cy="14" r="5"/><circle cx="24" cy="36" r="5"/><line x1="14" y1="14" x2="24" y2="36"/><line x1="34" y1="14" x2="24" y2="36"/><line x1="14" y1="14" x2="34" y2="14"/></svg>
+        </div>
+        <h3>Small Groups & Fellowship <span style="display:block;font-size:0.8em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">團契小組</span></h3>
+        <p>Weekly small groups where you can build real relationships, study Scripture, and pray together. Ask us which group fits your season of life.
+        <span style="display:block;margin-top:8px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">每週的團契小組，讓你建立真實的關係、一同查經與禱告。歡迎聯絡我們，為你找到合適的小組。</span></p>
+        <!-- TODO (Pastor/admin): replace with your actual small-group meeting days/times if you'd like to list them specifically. -->
+      </article>
+
+      <article class="pillar-card">
+        <div class="pillar-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="12" cy="24" r="4"/><circle cx="24" cy="12" r="4"/><circle cx="36" cy="24" r="4"/><circle cx="24" cy="36" r="4"/><line x1="12" y1="24" x2="24" y2="12"/><line x1="24" y1="12" x2="36" y2="24"/><line x1="36" y1="24" x2="24" y2="36"/><line x1="24" y1="36" x2="12" y2="24"/></svg>
+        </div>
+        <h3>Community Outreach <span style="display:block;font-size:0.8em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">社區外展</span></h3>
+        <p>Serving our Geneva Avenue neighbors through outreach and mercy ministry — living out our calling as a mission to San Francisco.
+        <span style="display:block;margin-top:8px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">透過外展服事與憐憫事工，服事Geneva Avenue一帶的鄰舍，活出我們對三藩市的使命。</span></p>
+        <!-- TODO (Pastor/admin): add specific outreach programs/partners here if you'd like to name them. -->
+      </article>
+    </div>
+  </section>
+
+  <!-- PATH / GET CONNECTED -->
+  <section class="path" id="path">
+    <span class="section-label section-label--center">03 — Finding your place here 在這裡找到你的位置</span>
+    <h2 class="path__heading">A path, not a program
+      <span style="display:block;margin-top:8px;font-size:0.6em;opacity:0.75;font-family:'Noto Sans TC',sans-serif;font-weight:500;">這是一條路，不是一個節目</span>
+    </h2>
+    <p class="path__sub">There's no single way in — but here's how most people begin.
+      <span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">沒有固定的方式——但這是大部分人開始的方式。</span>
+    </p>
+
+    <div class="timeline">
+      <div class="timeline__node" style="--i:0">
+        <span class="timeline__dot"></span>
+        <h4>Visit <span style="display:block;font-size:0.8em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">出席主日</span></h4>
+        <p>Join us this Sunday at 10:00am. No expectations — just come as you are.
+        <span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">這個主日早上10:00，歡迎你來，不需要任何準備，只要帶著自己來。</span></p>
+      </div>
+      <div class="timeline__node" style="--i:1">
+        <span class="timeline__dot"></span>
+        <h4>Connect <span style="display:block;font-size:0.8em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">建立連結</span></h4>
+        <p>Meet our pastoral team and get to know a small group after the service.
+        <span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">崇拜後可以認識牧者同工，並了解適合你的團契小組。</span></p>
+      </div>
+      <div class="timeline__node" style="--i:2">
+        <span class="timeline__dot"></span>
+        <h4>Grow <span style="display:block;font-size:0.8em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">一同成長</span></h4>
+        <p>Join a small group, serve on a ministry team, and grow in faith alongside others.
+        <span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">加入團契小組、參與事奉，在信仰中與弟兄姊妹一同成長。</span></p>
+      </div>
+      <div class="timeline__node" style="--i:3">
+        <span class="timeline__dot"></span>
+        <h4>Serve the city <span style="display:block;font-size:0.8em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">服事城市</span></h4>
+        <p>Take what you've received and serve this city — that's the mission continuing.
+        <span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">把所領受的，轉化成服事這城市的行動——這正是使命的延續。</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICE TIMES -->
+  <section class="events" id="events">
+    <span class="section-label">04 — Service times 崇拜聚會時間</span>
+    <h2 class="events__heading">Join us this week
+      <span style="display:block;margin-top:8px;font-size:0.6em;opacity:0.75;font-family:'Noto Sans TC',sans-serif;font-weight:500;">本週與我們相聚</span>
+    </h2>
+    <div class="events__list">
+      <article class="event-row">
+        <div class="event-row__date"><span>SUN</span><strong>10am</strong></div>
+        <div class="event-row__body">
+          <h3>Sunday Worship <span style="display:block;font-size:0.8em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">主日崇拜</span></h3>
+          <p>Our weekly worship gathering in Chinese and English. All are welcome, every week.
+          <span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">我們每週的中英雙語崇拜聚會，歡迎所有人隨時加入。</span></p>
+        </div>
+        <a href="#join" class="event-row__link">Get directions 查看地圖 →</a>
+      </article>
+      <!-- TODO (Pastor/admin): add more rows here for prayer meetings, Bible study, youth group, etc. Copy the event-row block above as a template. -->
+    </div>
+  </section>
+
+  <!-- JOIN / CONNECT -->
+  <section class="join" id="join">
+    <div class="join__card">
+      <h2>New to City Mission? <span style="display:block;font-size:0.65em;opacity:0.75;font-family:'Noto Sans TC',sans-serif;font-weight:500;margin-top:6px;">初次認識城市使命？</span></h2>
+      <p>Come worship with us this Sunday, or reach out — we'd love to hear from you.
+        <span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">這個主日歡迎你與我們一同敬拜，或直接聯絡我們——我們很樂意認識你。</span>
+      </p>
+      <div class="join__info">
+        <span>📍 66 Geneva Ave, San Francisco, CA 94112 — <a href="https://www.google.com/maps/search/?api=1&query=66+Geneva+Ave%2C+San+Francisco%2C+CA+94112" target="_blank" rel="noopener">Get directions 查看地圖</a></span>
+        <span>📞 <a href="tel:+14157416053">1-415-741-6053</a></span>
+      </div>
+      <form class="join__form" id="joinForm" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY">
+        <input type="hidden" name="subject" value="New City Mission website contact">
+        <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+        <div class="join__row">
+          <label>
+            <span>Name 姓名 <span class="join__required">*</span></span>
+            <input type="text" name="name" required placeholder="Your name">
+          </label>
+          <label>
+            <span>Email 電郵 <span class="join__required">*</span></span>
+            <input type="email" name="email" required placeholder="you@email.com">
+          </label>
+        </div>
+        <label>
+          <span>Phone 電話</span>
+          <input type="tel" name="phone" placeholder="e.g. 1-415-555-0123">
+        </label>
+        <label>
+          <span>I'm interested in 我對以下有興趣</span>
+          <select name="interest">
+            <option value="">— Select 請選擇 —</option>
+            <option value="Sunday Worship 主日崇拜">Sunday Worship 主日崇拜</option>
+            <option value="Small Groups 團契小組">Small Groups 團契小組</option>
+            <option value="Volunteering / Serving 事奉">Volunteering / Serving 事奉</option>
+            <option value="Something else 其他">Something else 其他</option>
+          </select>
+        </label>
+        <label>
+          <span>Message 留言</span>
+          <textarea name="message" rows="3" placeholder="Tell us a bit about yourself, or ask us a question..."></textarea>
+        </label>
+        <button type="submit" class="btn btn--primary">Send it in 送出</button>
+        <p class="join__note" id="joinNote" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer__brand">
+    <img src="assets/SFCFC-logo.png" alt="City Mission logo" class="footer__logo">
+    <div>
+      <p class="footer__en">City Mission</p>
+      <p class="footer__zh">城市使命四方福音會</p>
+    </div>
+  </div>
+  <p class="footer__copy">© <span id="year"></span> City Mission · SF Chinese Foursquare Church · Est. 2007 · 66 Geneva Ave, San Francisco, CA 94112</p>
+  <p class="footer__version" style="margin-top:6px; font-size:0.7rem; opacity:0.45;">v1.0 · 2026-09-01</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>City Mission · 城市使命四方福音會</title>
+<meta name="description" content="City Mission — swipe through the key info.">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="icon" href="assets/SFCFC-logo.png?v=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=1">
+<style>
+  /* live.html — swipeable single-screen slides, mobile-first */
+  html, body{ height:100%; overflow:hidden; overscroll-behavior: none; }
+  body{ display:flex; flex-direction:column; }
+
+  .live-shell{
+    flex: 1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    position:relative;
+  }
+
+  .live-track{
+    flex:1;
+    min-height: 0;
+    display:flex;
+    height:100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .live-track::-webkit-scrollbar{ display:none; }
+
+  .live-slide{
+    flex: 0 0 100%;
+    max-width: 100%;
+    height:100%;
+    min-height: 0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding: clamp(16px, 5vh, 28px) 24px;
+    box-sizing:border-box;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    overflow: hidden;
+  }
+  .live-slide__inner{ max-width: 440px; margin: 0 auto; width:100%; }
+
+  .live-slide.live-slide--scroll{
+    justify-content: flex-start;
+    overflow-y: auto;
+    padding-top: clamp(20px, 4vh, 32px);
+    padding-bottom: clamp(20px, 4vh, 32px);
+  }
+
+  .live-slide.live-slide--poster{
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .live-slide--poster .live-slide__inner{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    max-width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .live-poster{
+    max-width: 100%;
+    max-height: calc(100% - 150px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 14px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    flex-shrink: 0;
+  }
+  .live-poster-cta{
+    margin-top: 10px;
+    width: calc(100% - 48px);
+    max-width: 320px;
+  }
+  .live-poster-cta--map{
+    border-color: var(--cyan) !important;
+    color: var(--cyan) !important;
+    background: rgba(70,212,222,0.1) !important;
+  }
+  .live-poster-cta--map:hover{
+    background: rgba(70,212,222,0.18) !important;
+  }
+
+  /* --- bottom control bar: just the dots now --- */
+  .live-bottom{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 18px 0 8px;
+  }
+
+  .live-dots{
+    display:flex; justify-content:center; gap: 8px;
+  }
+  .live-dots button{
+    width:8px; height:8px; border-radius:50%;
+    background: var(--line);
+    border:none; padding:0; cursor:pointer;
+    transition: background 0.25s, transform 0.25s;
+  }
+  .live-dots button.is-active{
+    background: var(--grad);
+    transform: scale(1.3);
+  }
+
+  /* --- swipe arrows: edge-mounted, no button chrome, neon glow --- */
+  .live-arrow{
+    position:absolute;
+    top:50%;
+    transform: translateY(-50%);
+    width: 44px; height:44px;
+    background: none;
+    border: none;
+    padding:0;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    z-index:6;
+    transition: filter 0.25s, transform 0.15s, opacity 0.25s;
+  }
+  .live-arrow--prev{
+    left: 8px;
+    color: var(--gold);
+    animation: neon-flicker 2.2s ease-in-out infinite;
+  }
+  .live-arrow--next{
+    right: 8px;
+    color: var(--cyan);
+    animation: neon-flicker 2.2s ease-in-out infinite;
+    animation-delay: 0.4s;
+  }
+  @keyframes neon-flicker{
+    0%, 100%{
+      filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 10px currentColor) drop-shadow(0 0 18px currentColor);
+      opacity: 0.35;
+    }
+    50%{
+      filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 20px currentColor) drop-shadow(0 0 36px currentColor);
+      opacity: 0.55;
+    }
+  }
+  .live-arrow:hover{
+    animation-play-state: paused;
+    filter: drop-shadow(0 0 10px currentColor) drop-shadow(0 0 26px currentColor) drop-shadow(0 0 44px currentColor);
+    opacity: 0.85;
+  }
+  .live-arrow:active{ transform: translateY(-50%) scale(0.9); }
+  .live-arrow.is-hidden{ opacity:0.12; filter:none; animation:none; pointer-events:none; }
+  .live-arrow svg{ width:34px; height:34px; stroke-width: 2.4; }
+
+  /* --- header on every slide --- */
+  .live-header{ text-align:center; margin-bottom: 26px; }
+  .live-logo{ width: clamp(200px, 55vw, 300px); max-height: 32vh; height: auto; object-fit:contain; border-radius:28px; margin: 0 auto 16px; display:block; }
+  .live-en{ font-family: var(--font-display); font-weight:700; font-size:1.1rem; margin:0; }
+  .live-zh{ font-size:0.78rem; color: var(--ink-dim); margin: 3px 0 0; }
+
+  .live-tagline{
+    text-align:center;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height:1.4;
+    margin: 0;
+  }
+
+  .live-intro-cta{
+    display:block;
+    width: 100%;
+    max-width: 320px;
+    margin: 24px auto 0;
+    text-align:center;
+  }
+
+  .live-card{
+    background: var(--bg-panel-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(14px, 3.5vh, 22px);
+    margin-bottom: clamp(8px, 2vh, 14px);
+  }
+  .live-card__label{
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 8px;
+  }
+  .live-card h3{ font-family: var(--font-display); font-size: 1.05rem; margin: 0 0 6px; }
+  .live-card p{ color: var(--ink-dim); font-size: 0.9rem; margin: 0; }
+  .live-card__link{
+    display:inline-block;
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--gold);
+  }
+  .live-card__link:hover{ color: var(--cyan); }
+
+  .live-actions{ display:flex; flex-direction:column; gap: 12px; }
+  .live-actions .btn{ width:100%; padding: 15px 20px; font-size: 1rem; }
+
+  .live-contact{ text-align:center; font-size: 0.85rem; color: var(--ink-dim); margin-top: 22px; }
+  .live-contact a{ color: var(--gold); }
+  .live-contact p{ margin: 6px 0; }
+
+  .live-swipehint{
+    text-align:center;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    margin-top: 26px;
+  }
+
+  .live-version{
+    text-align:center;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.03em;
+    color: var(--ink-faint);
+    opacity: 0.6;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<div class="live-shell">
+
+  <button class="live-arrow live-arrow--prev is-hidden" id="prevBtn" aria-label="Previous">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 18l-6-6 6-6"/>
+      <path d="M11 18l-6-6 6-6"/>
+    </svg>
+  </button>
+  <button class="live-arrow live-arrow--next" id="nextBtn" aria-label="Next">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 18l6-6-6-6"/>
+      <path d="M13 18l6-6-6-6"/>
+    </svg>
+  </button>
+
+  <div class="live-track" id="track">
+
+    <!-- Slide 1: Intro -->
+    <section class="live-slide">
+      <div class="live-slide__inner">
+        <div class="live-header">
+          <img src="assets/SFCFC-logo.png?v=1" alt="City Mission logo" class="live-logo">
+          <p class="live-en">City Mission</p>
+          <p class="live-zh">城市使命四方福音會</p>
+        </div>
+        <h1 class="live-tagline">
+          The city is <span class="grad">our mission field</span>.
+          <span style="display:block;margin-top:8px;font-size:0.6em;opacity:0.75;font-family:'Noto Sans TC',sans-serif;font-weight:500;">城市，是我們的禾場。</span>
+        </h1>
+        <a href="index.html#events" class="btn btn--primary live-intro-cta">Join us Sunday 主日與我們相聚</a>
+        <p class="live-swipehint">← swipe 滑動 →</p>
+      </div>
+    </section>
+
+    <!-- Slide 2: Service info / poster -->
+    <section class="live-slide live-slide--poster">
+      <div class="live-slide__inner">
+        <img src="assets/SFCFC-hero.jpg?v=1" alt="City Mission — Sunday Worship 10:00am, 66 Geneva Ave, San Francisco" class="live-poster">
+        <a href="tel:+14157416053" class="btn btn--primary live-poster-cta">Sunday 10am · Call Us 主日10點 · 致電我們</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=66+Geneva+Ave%2C+San+Francisco%2C+CA+94112" target="_blank" rel="noopener" class="btn btn--ghost live-poster-cta live-poster-cta--map">Get Directions 查看地圖</a>
+      </div>
+    </section>
+
+    <!-- Slide 3: What We Do -->
+    <section class="live-slide live-slide--scroll">
+      <div class="live-slide__inner">
+        <p class="section-label section-label--center">What We Do 我們的事工</p>
+        <div class="live-card">
+          <h3>Sunday Worship <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">主日崇拜</span></h3>
+          <p>Join us every Sunday at 10:00am for worship in Chinese and English, as one congregation across generations.
+          <span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">歡迎你每主日早上10:00與我們一同敬拜，跨越語言與世代，成為同一個大家庭。</span></p>
+        </div>
+        <div class="live-card">
+          <h3>Small Groups & Fellowship <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">團契小組</span></h3>
+          <p>Weekly small groups where you can build real relationships, study Scripture, and pray together.
+          <span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">每週的團契小組，讓你建立真實的關係、一同查經與禱告。</span></p>
+        </div>
+        <div class="live-card">
+          <h3>Community Outreach <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">社區外展</span></h3>
+          <p>Serving our Geneva Avenue neighbors through outreach and mercy ministry — living out our calling as a mission to San Francisco.
+          <span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">透過外展服事與憐憫事工，服事Geneva Avenue一帶的鄰舍，活出我們對三藩市的使命。</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 4: Connect -->
+    <section class="live-slide">
+      <div class="live-slide__inner">
+        <p class="section-label section-label--center">Connect 聯絡我們</p>
+        <div class="live-actions">
+          <a href="index.html#join" class="btn btn--primary">Connect with us 聯絡我們</a>
+          <a href="index.html" class="btn btn--ghost">View full site 查看完整網站</a>
+        </div>
+        <div class="live-contact">
+          <p>📍 66 Geneva Ave, San Francisco, CA 94112</p>
+          <p>📞 <a href="tel:+14157416053">1-415-741-6053</a></p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="live-bottom">
+    <div class="live-dots" id="dots"></div>
+  </div>
+  <p class="live-version">v1.0 · updated 2026-09-01</p>
+</div>
+
+<script>
+  const track = document.getElementById('track');
+  const slides = track.querySelectorAll('.live-slide');
+  const dotsWrap = document.getElementById('dots');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let current = 0;
+
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+    dot.addEventListener('click', () => goTo(i));
+    dotsWrap.appendChild(dot);
+  });
+  const dots = dotsWrap.querySelectorAll('button');
+
+  function render(){
+    dots.forEach((d, i) => d.classList.toggle('is-active', i === current));
+    prevBtn.classList.toggle('is-hidden', current === 0);
+    nextBtn.classList.toggle('is-hidden', current === slides.length - 1);
+  }
+
+  function goTo(index, smooth = true){
+    current = Math.max(0, Math.min(slides.length - 1, index));
+    track.scrollTo({ left: current * track.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
+    render();
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  // --- native scroll-snap drives the swipe; we just track where it lands ---
+  let scrollTimeout;
+  track.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const width = track.clientWidth || 1;
+      const nearest = Math.round(track.scrollLeft / width);
+      current = Math.max(0, Math.min(slides.length - 1, nearest));
+      render();
+    }, 80);
+  }, { passive: true });
+
+  // Keep position correct if the viewport resizes (e.g. orientation change,
+  // or the mobile browser's address bar showing/hiding).
+  window.addEventListener('resize', () => goTo(current, false));
+
+  // --- keyboard arrows (desktop testing) ---
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') goTo(current + 1);
+    if (e.key === 'ArrowLeft') goTo(current - 1);
+  });
+
+  render();
+</script>
+</body>
+</html>

@@ -70,6 +70,8 @@
   }
   .live-slide.live-slide--intro{
     position: relative;
+    justify-content: flex-end;
+    padding-bottom: clamp(28px, 6vh, 44px);
     background-image:
       linear-gradient(180deg, rgba(10,12,20,0.55) 0%, rgba(10,12,20,0.78) 55%, var(--bg-deep) 100%),
       url("assets/SFCFC-live-bg.jpg?v=1");
@@ -348,7 +350,6 @@
             <span class="btn__label">Translation<br>翻譯</span>
           </a>
         </div>
-        <p class="live-swipehint">← swipe 滑動 →</p>
       </div>
     </section>
 
@@ -403,7 +404,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.12 · updated 2026-09-16</p>
+  <p class="live-version">v1.13 · updated 2026-09-16</p>
 </div>
 
 <script>

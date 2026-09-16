@@ -207,6 +207,12 @@
     text-align: center;
     white-space: normal;
   }
+  .live-intro-actions .btn svg{
+    width: 22px;
+    height: 22px;
+    margin-bottom: 2px;
+    flex-shrink: 0;
+  }
 
   .live-card{
     background: var(--bg-panel-2);
@@ -295,10 +301,19 @@
           <span style="display:block;margin-top:8px;font-size:0.6em;opacity:0.75;font-family:'Noto Sans TC',sans-serif;font-weight:500;">城市，是我們的禾場。</span>
         </h1>
         <div class="live-intro-actions">
-          <button type="button" class="btn btn--ghost" id="introBulletinBtn">Bulletin<br>週刊</button>
-          <a href="https://www.google.com/maps/search/?api=1&query=66+Geneva+Ave%2C+San+Francisco%2C+CA+94112" target="_blank" rel="noopener" class="btn btn--ghost">Direction<br>地址</a>
+          <a href="https://www.google.com/maps/search/?api=1&query=66+Geneva+Ave%2C+San+Francisco%2C+CA+94112" target="_blank" rel="noopener" class="btn btn--ghost">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.58 7-12a7 7 0 1 0-14 0c0 4.42 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            Direction<br>地址
+          </a>
+          <button type="button" class="btn btn--ghost" id="introBulletinBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M18 6h-3V3"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>
+            Bulletin<br>週刊
+          </button>
           <!-- TODO: replace with the real Zoom meeting link -->
-          <a href="YOUR_ZOOM_LINK_HERE" target="_blank" rel="noopener" class="btn btn--ghost">Translation<br>翻譯</a>
+          <a href="YOUR_ZOOM_LINK_HERE" target="_blank" rel="noopener" class="btn btn--ghost">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 6 4 9s-1.5 6.5-4 9c-2.5-2.5-4-6-4-9s1.5-6.5 4-9z"/></svg>
+            Translation<br>翻譯
+          </a>
         </div>
         <p class="live-swipehint">← swipe 滑動 →</p>
       </div>
@@ -355,7 +370,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.3 · updated 2026-09-16</p>
+  <p class="live-version">v1.4 · updated 2026-09-16</p>
 </div>
 
 <script>

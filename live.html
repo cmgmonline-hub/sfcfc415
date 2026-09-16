@@ -193,8 +193,30 @@
   @media (prefers-reduced-motion: reduce){
     .live-logo{ animation: none; filter: drop-shadow(0 0 5px rgba(255, 204, 51, 0.5)); }
   }
-  .live-en{ font-family: var(--font-display); font-weight:700; font-size:1.1rem; margin:0; }
-  .live-zh{ font-size:0.78rem; color: var(--ink-dim); margin: 3px 0 0; }
+  .live-clock{
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin: 12px auto 0;
+    padding: 10px 22px;
+    border: 1px solid var(--cyan);
+    background: rgba(70, 212, 222, 0.08);
+    color: var(--cyan);
+  }
+  .live-clock__time{
+    font-family: var(--font-mono);
+    font-size: 1.4rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+  .live-clock__date{
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
 
   .live-tagline{
     text-align:center;
@@ -365,8 +387,10 @@
       <div class="live-slide__inner">
         <div class="live-header">
           <img src="assets/SFCFC-logo.png?v=2" alt="City Mission logo" class="live-logo">
-          <p class="live-en">City Mission</p>
-          <p class="live-zh">城市使命四方福音會</p>
+          <div class="live-clock" id="liveClock">
+            <span class="live-clock__time" id="liveClockTime">--:--</span>
+            <span class="live-clock__date" id="liveClockDate">-- --- ----</span>
+          </div>
         </div>
         <div class="live-intro-actions">
           <a href="https://www.google.com/maps/search/?api=1&query=66+Geneva+Ave%2C+San+Francisco%2C+CA+94112" target="_blank" rel="noopener" class="btn btn--ghost">
@@ -457,7 +481,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.20 · updated 2026-09-16</p>
+  <p class="live-version">v1.21 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -502,6 +526,19 @@
       moreToggleBtn.classList.toggle('is-open', isOpen);
       moreToggleBtn.setAttribute('aria-expanded', String(isOpen));
     });
+  }
+
+  // --- live digital clock ---
+  const clockTimeEl = document.getElementById('liveClockTime');
+  const clockDateEl = document.getElementById('liveClockDate');
+  if (clockTimeEl && clockDateEl) {
+    const updateClock = () => {
+      const now = new Date();
+      clockTimeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+      clockDateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    };
+    updateClock();
+    setInterval(updateClock, 1000);
   }
 
   // --- native scroll-snap drives the swipe; we just track where it lands ---

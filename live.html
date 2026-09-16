@@ -65,8 +65,7 @@
   }
 
   .live-slide.live-slide--poster{
-    padding-left: 0;
-    padding-right: 0;
+    padding: 0;
   }
   .live-slide.live-slide--intro{
     position: relative;
@@ -79,22 +78,16 @@
     background-position: center;
   }
   .live-slide--poster .live-slide__inner{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
     max-width: 100%;
     height: 100%;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    margin: 0;
   }
   .live-poster{
-    width: calc(100% - 48px);
-    max-width: 320px;
-    height: auto;
-    object-fit: contain;
-    border-radius: 14px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-    flex-shrink: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
   .live-poster-cta{
     margin-top: 10px;
@@ -356,8 +349,6 @@
     <section class="live-slide live-slide--poster">
       <div class="live-slide__inner">
         <img src="assets/CityMa_001_cover.jpg?v=1" alt="城市週刊 City Magazine — 以愛承傳 Love Every Generation, SF Chinese Foursquare Church" class="live-poster">
-        <a href="tel:+14157416053" class="btn btn--primary live-poster-cta">Sunday 10am · Call Us 主日10點 · 致電我們</a>
-        <a href="https://www.google.com/maps/search/?api=1&query=66+Geneva+Ave%2C+San+Francisco%2C+CA+94112" target="_blank" rel="noopener" class="btn btn--ghost live-poster-cta live-poster-cta--map">Get Directions 查看地圖</a>
       </div>
     </section>
 
@@ -403,7 +394,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.15 · updated 2026-09-16</p>
+  <p class="live-version">v1.16 · updated 2026-09-16</p>
 </div>
 
 <script>

@@ -169,7 +169,27 @@
 
   /* --- header on every slide --- */
   .live-header{ text-align:center; margin-bottom: 26px; }
-  .live-logo{ width: clamp(200px, 55vw, 300px); max-height: 32vh; height: auto; object-fit:contain; border-radius:28px; margin: 0 auto 16px; display:block; }
+  .live-logo{
+    width: clamp(200px, 55vw, 300px);
+    max-height: 32vh;
+    height: auto;
+    object-fit:contain;
+    border-radius:28px;
+    margin: 0 auto 16px;
+    display:block;
+    animation: logoNeonPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes logoNeonPulse{
+    0%, 100% {
+      filter: drop-shadow(0 0 8px rgba(245, 230, 40, 0.35)) drop-shadow(0 0 3px rgba(245, 230, 40, 0.5));
+    }
+    50% {
+      filter: drop-shadow(0 0 24px rgba(245, 230, 40, 0.85)) drop-shadow(0 0 8px rgba(245, 230, 40, 0.9));
+    }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .live-logo{ animation: none; filter: drop-shadow(0 0 10px rgba(245, 230, 40, 0.5)); }
+  }
   .live-en{ font-family: var(--font-display); font-weight:700; font-size:1.1rem; margin:0; }
   .live-zh{ font-size:0.78rem; color: var(--ink-dim); margin: 3px 0 0; }
 
@@ -387,7 +407,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.8 · updated 2026-09-16</p>
+  <p class="live-version">v1.9 · updated 2026-09-16</p>
 </div>
 
 <script>

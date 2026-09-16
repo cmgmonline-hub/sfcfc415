@@ -200,9 +200,14 @@
     gap: 2px;
     margin: 12px auto 0;
     padding: 10px 22px;
-    border: 1px solid var(--cyan);
-    background: rgba(70, 212, 222, 0.08);
     color: var(--cyan);
+  }
+  .live-clock__zone{
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.7;
   }
   .live-clock__time{
     font-family: var(--font-mono);
@@ -216,6 +221,17 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
     opacity: 0.85;
+  }
+  .live-clock__weather{
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.03em;
+    margin-top: 2px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(70, 212, 222, 0.25);
+    width: 100%;
+    text-align: center;
+    opacity: 0.9;
   }
 
   .live-tagline{
@@ -388,8 +404,10 @@
         <div class="live-header">
           <img src="assets/SFCFC-logo.png?v=2" alt="City Mission logo" class="live-logo">
           <div class="live-clock" id="liveClock">
+            <span class="live-clock__zone">Pacific Time · PT</span>
             <span class="live-clock__time" id="liveClockTime">--:--</span>
             <span class="live-clock__date" id="liveClockDate">-- --- ----</span>
+            <span class="live-clock__weather" id="liveClockWeather">San Francisco · --°F</span>
           </div>
         </div>
         <div class="live-intro-actions">
@@ -481,7 +499,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.21 · updated 2026-09-16</p>
+  <p class="live-version">v1.24 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -528,17 +546,38 @@
     });
   }
 
-  // --- live digital clock ---
+  // --- live digital clock (Pacific Time, since that's the church's timezone) ---
   const clockTimeEl = document.getElementById('liveClockTime');
   const clockDateEl = document.getElementById('liveClockDate');
   if (clockTimeEl && clockDateEl) {
     const updateClock = () => {
       const now = new Date();
-      clockTimeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-      clockDateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+      clockTimeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'America/Los_Angeles' });
+      clockDateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'America/Los_Angeles' });
     };
     updateClock();
     setInterval(updateClock, 1000);
+  }
+
+  // --- San Francisco current weather (Open-Meteo: free, no API key) ---
+  const weatherEl = document.getElementById('liveClockWeather');
+  if (weatherEl) {
+    const weatherCodeMap = {
+      0: 'Clear', 1: 'Mostly Clear', 2: 'Partly Cloudy', 3: 'Cloudy',
+      45: 'Fog', 48: 'Fog', 51: 'Light Drizzle', 53: 'Drizzle', 55: 'Drizzle',
+      61: 'Light Rain', 63: 'Rain', 65: 'Heavy Rain', 71: 'Light Snow', 73: 'Snow',
+      75: 'Heavy Snow', 80: 'Showers', 81: 'Showers', 82: 'Heavy Showers', 95: 'Thunderstorm'
+    };
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=37.7749&longitude=-122.4194&current=temperature_2m,weather_code&temperature_unit=fahrenheit&timezone=America%2FLos_Angeles')
+      .then(res => res.json())
+      .then(data => {
+        const temp = Math.round(data.current.temperature_2m);
+        const desc = weatherCodeMap[data.current.weather_code] || '';
+        weatherEl.textContent = `San Francisco · ${temp}°F${desc ? ' · ' + desc : ''}`;
+      })
+      .catch(() => {
+        weatherEl.textContent = 'San Francisco · weather unavailable';
+      });
   }
 
   // --- native scroll-snap drives the swipe; we just track where it lands ---

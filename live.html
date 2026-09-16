@@ -238,15 +238,10 @@
     color: var(--cyan);
     border-color: var(--cyan);
     background: rgba(70, 212, 222, 0.08);
-    box-shadow: 0 0 10px rgba(70, 212, 222, 0.35);
-    animation: introBtnPulse 2.4s ease-in-out infinite;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.15s ease;
   }
-  .live-intro-actions .btn:nth-child(2){ animation-delay: 0.3s; }
-  .live-intro-actions .btn:nth-child(3){ animation-delay: 0.6s; }
   .live-intro-actions .btn:active{
     transform: scale(0.93);
-    box-shadow: 0 0 22px rgba(70, 212, 222, 0.7);
   }
   .live-intro-actions .btn svg{
     width: 22px;
@@ -254,13 +249,6 @@
     margin-bottom: 2px;
     flex-shrink: 0;
     stroke: var(--cyan);
-  }
-  @keyframes introBtnPulse{
-    0%, 100% { box-shadow: 0 0 8px rgba(70, 212, 222, 0.3); }
-    50% { box-shadow: 0 0 20px rgba(70, 212, 222, 0.75); }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .live-intro-actions .btn{ animation: none; }
   }
 
   .live-card{
@@ -415,7 +403,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.11 · updated 2026-09-16</p>
+  <p class="live-version">v1.12 · updated 2026-09-16</p>
 </div>
 
 <script>

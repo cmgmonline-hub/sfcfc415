@@ -197,22 +197,44 @@
     margin: 24px auto 0;
   }
   .live-intro-actions .btn{
+    position: relative;
     flex: 1;
     aspect-ratio: 1 / 1;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 2px;
     padding: 8px 4px;
     font-size: 0.76rem;
     line-height: 1.3;
     text-align: center;
-    text-transform: uppercase;
     white-space: normal;
   }
   .live-intro-actions .btn svg{
-    width: 22px;
-    height: 22px;
-    margin-bottom: 2px;
+    width: 24px;
+    height: 24px;
     flex-shrink: 0;
+  }
+  .live-intro-actions .btn__label{
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translate(-50%, 6px);
+    background: var(--bg-panel-2);
+    border: 1px solid var(--line);
+    padding: 8px 12px;
+    font-size: 0.7rem;
+    line-height: 1.3;
+    text-transform: uppercase;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 2;
+  }
+  .live-intro-actions .btn.is-pressed .btn__label{
+    opacity: 1;
+    transform: translate(-50%, 0);
   }
 
   .live-card{
@@ -300,16 +322,16 @@
         <div class="live-intro-actions">
           <a href="https://www.google.com/maps/search/?api=1&query=66+Geneva+Ave%2C+San+Francisco%2C+CA+94112" target="_blank" rel="noopener" class="btn btn--ghost">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.58 7-12a7 7 0 1 0-14 0c0 4.42 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
-            Direction<br>地址
+            <span class="btn__label">Direction<br>地址</span>
           </a>
           <button type="button" class="btn btn--ghost" id="introBulletinBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M18 6h-3V3"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>
-            Bulletin<br>週刊
+            <span class="btn__label">Bulletin<br>週刊</span>
           </button>
           <!-- TODO: replace with the real Zoom meeting link -->
           <a href="YOUR_ZOOM_LINK_HERE" target="_blank" rel="noopener" class="btn btn--ghost">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 6 4 9s-1.5 6.5-4 9c-2.5-2.5-4-6-4-9s1.5-6.5 4-9z"/></svg>
-            Translation<br>翻譯
+            <span class="btn__label">Translation<br>翻譯</span>
           </a>
         </div>
         <p class="live-swipehint">← swipe 滑動 →</p>
@@ -367,7 +389,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.5 · updated 2026-09-16</p>
+  <p class="live-version">v1.6 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -403,6 +425,18 @@
 
   const introBulletinBtn = document.getElementById('introBulletinBtn');
   if (introBulletinBtn) introBulletinBtn.addEventListener('click', () => goTo(current + 1));
+
+  // --- intro action buttons: show label only while pressed/touched ---
+  document.querySelectorAll('.live-intro-actions .btn').forEach(btn => {
+    const press = () => btn.classList.add('is-pressed');
+    const release = () => btn.classList.remove('is-pressed');
+    btn.addEventListener('touchstart', press, { passive: true });
+    btn.addEventListener('touchend', release);
+    btn.addEventListener('touchcancel', release);
+    btn.addEventListener('mousedown', press);
+    btn.addEventListener('mouseup', release);
+    btn.addEventListener('mouseleave', release);
+  });
 
   // --- native scroll-snap drives the swipe; we just track where it lands ---
   let scrollTimeout;

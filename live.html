@@ -189,6 +189,22 @@
     text-align:center;
   }
 
+  .live-intro-actions{
+    display:flex;
+    gap: 8px;
+    width: 100%;
+    max-width: 380px;
+    margin: 24px auto 0;
+  }
+  .live-intro-actions .btn{
+    flex: 1;
+    padding: 12px 4px;
+    font-size: 0.76rem;
+    line-height: 1.25;
+    text-align: center;
+    white-space: normal;
+  }
+
   .live-card{
     background: var(--bg-panel-2);
     border: 1px solid var(--line);
@@ -275,7 +291,12 @@
           The city is <span class="grad">our mission field</span>.
           <span style="display:block;margin-top:8px;font-size:0.6em;opacity:0.75;font-family:'Noto Sans TC',sans-serif;font-weight:500;">城市，是我們的禾場。</span>
         </h1>
-        <a href="index.html#events" class="btn btn--primary live-intro-cta">Join us Sunday 主日與我們相聚</a>
+        <div class="live-intro-actions">
+          <button type="button" class="btn btn--ghost" id="introBulletinBtn">Bulletin 週刊</button>
+          <a href="https://www.google.com/maps/search/?api=1&query=66+Geneva+Ave%2C+San+Francisco%2C+CA+94112" target="_blank" rel="noopener" class="btn btn--ghost">Direction 地址</a>
+          <!-- TODO: replace with the real Zoom meeting link -->
+          <a href="YOUR_ZOOM_LINK_HERE" target="_blank" rel="noopener" class="btn btn--ghost">Translation 翻譯</a>
+        </div>
         <p class="live-swipehint">← swipe 滑動 →</p>
       </div>
     </section>
@@ -331,7 +352,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.1 · updated 2026-09-04</p>
+  <p class="live-version">v1.2 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -364,6 +385,9 @@
 
   prevBtn.addEventListener('click', () => goTo(current - 1));
   nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  const introBulletinBtn = document.getElementById('introBulletinBtn');
+  if (introBulletinBtn) introBulletinBtn.addEventListener('click', () => goTo(current + 1));
 
   // --- native scroll-snap drives the swipe; we just track where it lands ---
   let scrollTimeout;

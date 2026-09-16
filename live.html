@@ -298,25 +298,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
     max-width: 380px;
     margin: 14px auto 0;
-    background: none;
-    border: none;
+    background: rgba(70, 212, 222, 0.08);
+    border: 1px solid var(--cyan);
     cursor: pointer;
-    color: var(--ink-dim);
+    color: var(--cyan);
     font-family: inherit;
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 8px;
-    transition: color 0.2s ease;
+    letter-spacing: 0.06em;
+    padding: 12px;
+    transition: transform 0.15s ease, background 0.2s ease;
   }
-  .live-more-toggle:active{ color: var(--cyan); }
+  .live-more-toggle:active{
+    transform: scale(0.97);
+    background: rgba(70, 212, 222, 0.18);
+  }
   .live-more-toggle svg{
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
     transition: transform 0.25s ease;
   }
   .live-more-toggle.is-open svg{ transform: rotate(180deg); }
@@ -509,7 +513,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.26 · updated 2026-09-16</p>
+  <p class="live-version">v1.27 · updated 2026-09-16</p>
 </div>
 
 <script>

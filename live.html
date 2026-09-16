@@ -68,6 +68,14 @@
     padding-left: 0;
     padding-right: 0;
   }
+  .live-slide.live-slide--intro{
+    position: relative;
+    background-image:
+      linear-gradient(180deg, rgba(10,12,20,0.55) 0%, rgba(10,12,20,0.78) 55%, var(--bg-deep) 100%),
+      url("assets/SFCFC-live-bg.jpg?v=1");
+    background-size: cover;
+    background-position: center;
+  }
   .live-slide--poster .live-slide__inner{
     display:flex;
     flex-direction:column;
@@ -330,7 +338,7 @@
   <div class="live-track" id="track">
 
     <!-- Slide 1: Intro -->
-    <section class="live-slide">
+    <section class="live-slide live-slide--intro">
       <div class="live-slide__inner">
         <div class="live-header">
           <img src="assets/SFCFC-logo.png?v=1" alt="City Mission logo" class="live-logo">
@@ -407,7 +415,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.10 · updated 2026-09-16</p>
+  <p class="live-version">v1.11 · updated 2026-09-16</p>
 </div>
 
 <script>

@@ -197,41 +197,51 @@
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: 4px;
     margin: 12px auto 0;
     padding: 10px 22px;
     color: var(--cyan);
   }
   .live-clock__zone{
     font-family: var(--font-mono);
-    font-size: 0.62rem;
+    font-size: 0.78rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     opacity: 0.7;
   }
   .live-clock__time{
     font-family: var(--font-mono);
-    font-size: 1.4rem;
+    font-size: 2.1rem;
     font-weight: 500;
     letter-spacing: 0.03em;
   }
   .live-clock__date{
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: 0.9rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     opacity: 0.85;
   }
   .live-clock__weather{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     font-family: var(--font-mono);
-    font-size: 0.68rem;
+    font-size: 0.88rem;
     letter-spacing: 0.03em;
-    margin-top: 2px;
-    padding-top: 6px;
+    margin-top: 4px;
+    padding-top: 8px;
     border-top: 1px solid rgba(70, 212, 222, 0.25);
     width: 100%;
     text-align: center;
     opacity: 0.9;
+  }
+  .live-clock__weather svg{
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    stroke: var(--cyan);
   }
 
   .live-tagline{
@@ -407,7 +417,7 @@
             <span class="live-clock__zone">Pacific Time · PT</span>
             <span class="live-clock__time" id="liveClockTime">--:--</span>
             <span class="live-clock__date" id="liveClockDate">-- --- ----</span>
-            <span class="live-clock__weather" id="liveClockWeather">San Francisco · --°F</span>
+            <span class="live-clock__weather" id="liveClockWeather"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/></svg><span id="liveClockWeatherText">San Francisco · --°F</span></span>
           </div>
         </div>
         <div class="live-intro-actions">
@@ -499,7 +509,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.24 · updated 2026-09-16</p>
+  <p class="live-version">v1.26 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -560,23 +570,40 @@
   }
 
   // --- San Francisco current weather (Open-Meteo: free, no API key) ---
-  const weatherEl = document.getElementById('liveClockWeather');
-  if (weatherEl) {
-    const weatherCodeMap = {
-      0: 'Clear', 1: 'Mostly Clear', 2: 'Partly Cloudy', 3: 'Cloudy',
-      45: 'Fog', 48: 'Fog', 51: 'Light Drizzle', 53: 'Drizzle', 55: 'Drizzle',
-      61: 'Light Rain', 63: 'Rain', 65: 'Heavy Rain', 71: 'Light Snow', 73: 'Snow',
-      75: 'Heavy Snow', 80: 'Showers', 81: 'Showers', 82: 'Heavy Showers', 95: 'Thunderstorm'
+  const weatherIconEl = document.querySelector('#liveClockWeather svg');
+  const weatherTextEl = document.getElementById('liveClockWeatherText');
+  if (weatherIconEl && weatherTextEl) {
+    // maps Open-Meteo WMO weather codes to a simple icon shape
+    const weatherIcons = {
+      clear: '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
+      partly: '<path d="M8.5 17H17a3.5 3.5 0 0 0 .5-6.96A5 5 0 0 0 8 8.5"/><circle cx="7" cy="8" r="3.2"/><path d="M7 3.2V2M2.8 8H2M11.8 4.5l.6-.6M2.8 12.6l-.6.6"/>',
+      cloudy: '<path d="M6.5 18H17a3.5 3.5 0 0 0 .5-6.96 5 5 0 0 0-9.62-1.94A4 4 0 0 0 6.5 18z"/>',
+      fog: '<path d="M5 10h14M3 14h18M6 18h12"/>',
+      rain: '<path d="M7 16H16.5a3.5 3.5 0 0 0 .5-6.96A5 5 0 0 0 7.5 7.5" /><path d="M8 19l-1 2M12 19l-1 2M16 19l-1 2"/>',
+      snow: '<path d="M7 16H16.5a3.5 3.5 0 0 0 .5-6.96A5 5 0 0 0 7.5 7.5" /><path d="M12 18v4M10 19.5l4 1M14 19.5l-4 1"/>',
+      storm: '<path d="M7 14H16.5a3.5 3.5 0 0 0 .5-6.96A5 5 0 0 0 7.5 5.5" /><path d="M13 15l-3 5h3l-2 4"/>'
+    };
+    const weatherIconKey = code => {
+      if (code === 0) return 'clear';
+      if (code === 1 || code === 2) return 'partly';
+      if (code === 3) return 'cloudy';
+      if (code === 45 || code === 48) return 'fog';
+      if ([51,53,55,61,63,65,80,81,82].includes(code)) return 'rain';
+      if ([71,73,75].includes(code)) return 'snow';
+      if (code === 95) return 'storm';
+      return 'cloudy';
     };
     fetch('https://api.open-meteo.com/v1/forecast?latitude=37.7749&longitude=-122.4194&current=temperature_2m,weather_code&temperature_unit=fahrenheit&timezone=America%2FLos_Angeles')
       .then(res => res.json())
       .then(data => {
         const temp = Math.round(data.current.temperature_2m);
-        const desc = weatherCodeMap[data.current.weather_code] || '';
-        weatherEl.textContent = `San Francisco · ${temp}°F${desc ? ' · ' + desc : ''}`;
+        const tempC = Math.round((data.current.temperature_2m - 32) * 5 / 9);
+        const key = weatherIconKey(data.current.weather_code);
+        weatherIconEl.innerHTML = weatherIcons[key];
+        weatherTextEl.textContent = `San Francisco · ${temp}°F / ${tempC}°C`;
       })
       .catch(() => {
-        weatherEl.textContent = 'San Francisco · weather unavailable';
+        weatherTextEl.textContent = 'San Francisco · weather unavailable';
       });
   }
 

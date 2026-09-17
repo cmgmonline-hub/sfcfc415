@@ -377,6 +377,10 @@
     color: var(--ink-dim);
     margin: 0;
   }
+  .live-card .live-announcements__location a{
+    color: var(--cyan);
+    text-decoration: underline;
+  }
   .live-card .live-announcements__fee{
     font-family: var(--font-mono);
     font-size: 0.72rem;
@@ -573,7 +577,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.56 · updated 2026-09-16</p>
+  <p class="live-version">v1.57 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -693,7 +697,7 @@
               ${(titleEn || titleZh) ? `<p class="live-announcements__title">${titleEn}${titleZh ? ` <span class="live-announcements__title-zh">${titleZh}</span>` : ''}</p>` : ''}
               ${hasMeta ? `<div class="live-announcements__meta">
                 ${dateTime ? `<p class="live-announcements__date">${dateTime}</p>` : ''}
-                ${location ? `<p class="live-announcements__location">📍 ${location}</p>` : ''}
+                ${location ? `<p class="live-announcements__location">📍 <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}" target="_blank" rel="noopener">${location}</a></p>` : ''}
                 ${fee ? `<p class="live-announcements__fee">💲 ${fee}</p>` : ''}
               </div>` : ''}
               ${contentEn ? `<p class="live-announcements__content-en">${contentEn}</p>` : ''}

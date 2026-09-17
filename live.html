@@ -388,6 +388,27 @@
     opacity: 0.8;
     margin: 6px 0 0;
   }
+  .live-announcements__link{
+    display: inline-block;
+    margin-top: 12px;
+    color: var(--cyan);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-bottom: 1px solid var(--cyan);
+    padding-bottom: 2px;
+  }
+  .live-announcements__link:active{ opacity: 0.7; }
+  .live-announcements__image{
+    display: block;
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
   .live-card p{ color: var(--ink-dim); font-size: 0.9rem; margin: 0; }
   .live-card__link{
     display:inline-block;
@@ -535,7 +556,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.43 · updated 2026-09-16</p>
+  <p class="live-version">v1.45 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -577,7 +598,7 @@
 
   // --- Announcements, loaded from a public Google Sheet ---
   // Setup: create a Google Sheet with columns in this order —
-  //   Title EN | Title ZH | Date/Time | Content EN | Content ZH
+  //   Title EN | Title ZH | Date/Time | Content EN | Content ZH | Link (optional) | Image URL (optional)
   // Share it as "Anyone with the link can view", then put its ID below
   // (the long ID in the sheet's URL between /d/ and /edit).
   const ANNOUNCEMENTS_SHEET_ID = '1F2atc-BBJk5llQX5u_BSTQ73jhRbZ6Ns5XyNe47IAP8';
@@ -617,13 +638,15 @@
         announcementsListEl.innerHTML = rows.map(row => {
           const cells = row.c || [];
           const get = i => (cells[i] && cells[i].v != null) ? cells[i].v : '';
-          const titleEn = get(0), titleZh = get(1), dateTime = formatSheetDate(get(2)), contentEn = get(3), contentZh = get(4);
+          const titleEn = get(0), titleZh = get(1), dateTime = formatSheetDate(get(2)), contentEn = get(3), contentZh = get(4), link = get(5), image = get(6);
           return `
             <div class="live-card">
+              ${image ? `<img src="${image}" alt="" class="live-announcements__image" loading="lazy">` : ''}
               ${(titleEn || titleZh) ? `<p class="live-announcements__title">${titleEn}${titleZh ? ` <span class="live-announcements__title-zh">${titleZh}</span>` : ''}</p>` : ''}
               ${dateTime ? `<p class="live-announcements__date">${dateTime}</p>` : ''}
               ${contentEn ? `<p class="live-announcements__content-en">${contentEn}</p>` : ''}
               ${contentZh ? `<p class="live-announcements__content-zh">${contentZh}</p>` : ''}
+              ${link ? `<a href="${link}" target="_blank" rel="noopener" class="live-announcements__link">Learn More 了解更多 →</a>` : ''}
             </div>`;
         }).join('');
       })

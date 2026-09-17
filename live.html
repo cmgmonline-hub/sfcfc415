@@ -404,7 +404,7 @@
   .live-announcements__image{
     display: block;
     width: 100%;
-    max-height: 200px;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
     border-radius: 8px;
     margin-bottom: 12px;
@@ -556,7 +556,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.45 · updated 2026-09-16</p>
+  <p class="live-version">v1.47 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -641,7 +641,7 @@
           const titleEn = get(0), titleZh = get(1), dateTime = formatSheetDate(get(2)), contentEn = get(3), contentZh = get(4), link = get(5), image = get(6);
           return `
             <div class="live-card">
-              ${image ? `<img src="${image}" alt="" class="live-announcements__image" loading="lazy">` : ''}
+              ${image ? `<img src="${image}" alt="" class="live-announcements__image" loading="lazy" onerror="this.style.display='none'">` : ''}
               ${(titleEn || titleZh) ? `<p class="live-announcements__title">${titleEn}${titleZh ? ` <span class="live-announcements__title-zh">${titleZh}</span>` : ''}</p>` : ''}
               ${dateTime ? `<p class="live-announcements__date">${dateTime}</p>` : ''}
               ${contentEn ? `<p class="live-announcements__content-en">${contentEn}</p>` : ''}

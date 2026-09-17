@@ -441,10 +441,10 @@
         </button>
 
         <div class="live-intro-actions live-intro-actions--more" id="moreActions">
-          <a href="index.html#events" class="btn btn--ghost">
+          <button type="button" class="btn btn--ghost" id="introEventBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
             <span class="btn__label">Event<br>活動</span>
-          </a>
+          </button>
           <!-- TODO: replace with the real donation/giving link -->
           <a href="YOUR_DONATION_LINK_HERE" target="_blank" rel="noopener" class="btn btn--ghost">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.35-9-8.5C1 7.5 3 4.5 6.5 4.5c1.9 0 3.4 1.1 4.3 2.5.9-1.4 2.4-2.5 4.3-2.5C18.6 4.5 21 7.5 20 11.5 18 15.65 12 20 12 20z"/></svg>
@@ -508,7 +508,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.34 · updated 2026-09-16</p>
+  <p class="live-version">v1.35 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -544,6 +544,9 @@
 
   const introBulletinBtn = document.getElementById('introBulletinBtn');
   if (introBulletinBtn) introBulletinBtn.addEventListener('click', () => goTo(current + 1));
+
+  const introEventBtn = document.getElementById('introEventBtn');
+  if (introEventBtn) introEventBtn.addEventListener('click', () => goTo(2));
 
   const moreToggleBtn = document.getElementById('moreToggleBtn');
   const moreActions = document.getElementById('moreActions');

@@ -588,7 +588,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.63 · updated 2026-09-16</p>
+  <p class="live-version">v1.65 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -697,7 +697,9 @@
           if (dateParts) {
             return new Date(dateParts.y, dateParts.mo, dateParts.d, timeParts ? timeParts.h : 0, timeParts ? timeParts.mi : 0);
           }
-          const combinedText = [dateRaw, timeRaw].filter(Boolean).join(' ');
+          // Join with "T" (proper ISO 8601) rather than a space — Safari's Date
+          // parser is strict and doesn't reliably accept "YYYY-MM-DD HH:MM".
+          const combinedText = timeRaw ? `${dateRaw}T${timeRaw}` : dateRaw;
           if (!combinedText) return null;
           const parsed = new Date(combinedText);
           return isNaN(parsed.getTime()) ? null : parsed;
@@ -721,6 +723,23 @@
               out += ` ${hours}:${minutes}${ampm}`;
             } else if (typeof timeRaw === 'string' && timeRaw) {
               out += ` ${timeRaw}`;
+            }
+            return out;
+          }
+          // Plain typed text (e.g. from the admin page's date/time dropdowns, or
+          // manually typed into the sheet): parse it into a real Date so the
+          // 24-hour "14:30" the admin page stores becomes a proper "2:30PM" here.
+          const combined = combineDateTime(dateRaw, timeRaw);
+          if (combined) {
+            const mm = String(combined.getMonth() + 1).padStart(2, '0');
+            const dd = String(combined.getDate()).padStart(2, '0');
+            const weekday = combined.toLocaleDateString('en-US', { weekday: 'short' });
+            let out = `${mm}-${dd}-${combined.getFullYear()} (${weekday})`;
+            if (timeRaw) {
+              let hours = combined.getHours() % 12; if (hours === 0) hours = 12;
+              const minutes = String(combined.getMinutes()).padStart(2, '0');
+              const ampm = combined.getHours() >= 12 ? 'PM' : 'AM';
+              out += ` ${hours}:${minutes}${ampm}`;
             }
             return out;
           }

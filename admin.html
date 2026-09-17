@@ -172,15 +172,10 @@
       <div class="row2">
         <div class="field"><label>Date 日期</label><input type="date" id="f_date"></div>
         <div class="field">
-          <label>Time 時間 (optional)</label>
+          <label>Time 時間 24hr (optional)</label>
           <div style="display:flex; gap:4px;">
             <select id="f_timeHour" style="flex:1;"></select>
             <select id="f_timeMin" style="flex:1;"></select>
-            <select id="f_timeAmpm" style="flex:1;">
-              <option value="">--</option>
-              <option value="AM">AM</option>
-              <option value="PM">PM</option>
-            </select>
           </div>
         </div>
       </div>
@@ -207,7 +202,7 @@
     <div id="status"></div>
     <div id="list"></div>
   </div>
-  <p class="admin-version">v1.4 · updated 2026-09-16</p>
+  <p class="admin-version">v1.5 · updated 2026-09-16</p>
 
 <script>
   // TODO: this is your Apps Script Web App URL from the deployment step
@@ -231,35 +226,28 @@
   const hourSelect = document.getElementById('f_timeHour');
   const minSelect = document.getElementById('f_timeMin');
   hourSelect.innerHTML = '<option value="">--</option>' +
-    Array.from({length: 12}, (_, i) => i + 1).map(h => `<option value="${h}">${h}</option>`).join('');
+    Array.from({length: 24}, (_, i) => i).map(h => `<option value="${h}">${String(h).padStart(2,'0')}</option>`).join('');
   minSelect.innerHTML = '<option value="">--</option>' +
     Array.from({length: 12}, (_, i) => i * 5).map(m => `<option value="${m}">${String(m).padStart(2,'0')}</option>`).join('');
 
-  // Converts the 3 dropdowns to a 24-hour "HH:MM" string, or '' if time isn't set.
+  // Reads the 2 dropdowns as a 24-hour "HH:MM" string, or '' if time isn't set.
   function readTimeFields() {
     const h = document.getElementById('f_timeHour').value;
     const m = document.getElementById('f_timeMin').value;
-    const ap = document.getElementById('f_timeAmpm').value;
-    if (!h || m === '' || !ap) return '';
-    let h24 = parseInt(h, 10) % 12;
-    if (ap === 'PM') h24 += 12;
-    return String(h24).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+    if (h === '' || m === '') return '';
+    return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
   }
 
-  // Converts a stored 24-hour "HH:MM" string back into the 3 dropdowns.
+  // Writes a stored 24-hour "HH:MM" string back into the 2 dropdowns.
   function writeTimeFields(hhmm) {
     if (!hhmm || !/^\d{1,2}:\d{2}$/.test(hhmm)) {
       document.getElementById('f_timeHour').value = '';
       document.getElementById('f_timeMin').value = '';
-      document.getElementById('f_timeAmpm').value = '';
       return;
     }
-    const [h24, m] = hhmm.split(':').map(Number);
-    const ap = h24 >= 12 ? 'PM' : 'AM';
-    let h12 = h24 % 12; if (h12 === 0) h12 = 12;
-    document.getElementById('f_timeHour').value = String(h12);
+    const [h, m] = hhmm.split(':').map(Number);
+    document.getElementById('f_timeHour').value = String(h);
     document.getElementById('f_timeMin').value = String(Math.round(m / 5) * 5 % 60);
-    document.getElementById('f_timeAmpm').value = ap;
   }
   const formTitle = document.getElementById('formTitle');
 

@@ -121,7 +121,7 @@
     letter-spacing: 0.05em;
     margin-bottom: 5px;
   }
-  .field input, .field textarea{
+  .field input, .field textarea, .field select{
     width: 100%;
     box-sizing: border-box;
     background: var(--bg-panel-2);
@@ -171,7 +171,18 @@
       </div>
       <div class="row2">
         <div class="field"><label>Date 日期</label><input type="date" id="f_date"></div>
-        <div class="field"><label>Time 時間</label><input type="time" id="f_time"></div>
+        <div class="field">
+          <label>Time 時間 (optional)</label>
+          <div style="display:flex; gap:4px;">
+            <select id="f_timeHour" style="flex:1;"></select>
+            <select id="f_timeMin" style="flex:1;"></select>
+            <select id="f_timeAmpm" style="flex:1;">
+              <option value="">--</option>
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
+        </div>
       </div>
       <div class="row2">
         <div class="field"><label>Location 地點</label><input type="text" id="f_location"></div>
@@ -196,7 +207,7 @@
     <div id="status"></div>
     <div id="list"></div>
   </div>
-  <p class="admin-version">v1.3 · updated 2026-09-16</p>
+  <p class="admin-version">v1.4 · updated 2026-09-16</p>
 
 <script>
   // TODO: this is your Apps Script Web App URL from the deployment step
@@ -214,6 +225,42 @@
   const listEl = document.getElementById('list');
   const statusEl = document.getElementById('status');
   const formPanel = document.getElementById('formPanel');
+
+  // Populate the time dropdowns (replacing native <input type="time">, which has
+  // a known iOS Safari bug where the wheel picker doesn't always commit a value).
+  const hourSelect = document.getElementById('f_timeHour');
+  const minSelect = document.getElementById('f_timeMin');
+  hourSelect.innerHTML = '<option value="">--</option>' +
+    Array.from({length: 12}, (_, i) => i + 1).map(h => `<option value="${h}">${h}</option>`).join('');
+  minSelect.innerHTML = '<option value="">--</option>' +
+    Array.from({length: 12}, (_, i) => i * 5).map(m => `<option value="${m}">${String(m).padStart(2,'0')}</option>`).join('');
+
+  // Converts the 3 dropdowns to a 24-hour "HH:MM" string, or '' if time isn't set.
+  function readTimeFields() {
+    const h = document.getElementById('f_timeHour').value;
+    const m = document.getElementById('f_timeMin').value;
+    const ap = document.getElementById('f_timeAmpm').value;
+    if (!h || m === '' || !ap) return '';
+    let h24 = parseInt(h, 10) % 12;
+    if (ap === 'PM') h24 += 12;
+    return String(h24).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+  }
+
+  // Converts a stored 24-hour "HH:MM" string back into the 3 dropdowns.
+  function writeTimeFields(hhmm) {
+    if (!hhmm || !/^\d{1,2}:\d{2}$/.test(hhmm)) {
+      document.getElementById('f_timeHour').value = '';
+      document.getElementById('f_timeMin').value = '';
+      document.getElementById('f_timeAmpm').value = '';
+      return;
+    }
+    const [h24, m] = hhmm.split(':').map(Number);
+    const ap = h24 >= 12 ? 'PM' : 'AM';
+    let h12 = h24 % 12; if (h12 === 0) h12 = 12;
+    document.getElementById('f_timeHour').value = String(h12);
+    document.getElementById('f_timeMin').value = String(Math.round(m / 5) * 5 % 60);
+    document.getElementById('f_timeAmpm').value = ap;
+  }
   const formTitle = document.getElementById('formTitle');
 
   document.getElementById('unlockBtn').addEventListener('click', unlock);
@@ -301,8 +348,9 @@
   function closeForm() {
     formPanel.style.display = 'none';
     editingRowIndex = null;
-    ['f_titleEn','f_titleZh','f_date','f_time','f_location','f_fee','f_contentEn','f_contentZh','f_link','f_imageUrl']
+    ['f_titleEn','f_titleZh','f_date','f_location','f_fee','f_contentEn','f_contentZh','f_link','f_imageUrl']
       .forEach(id => document.getElementById(id).value = '');
+    writeTimeFields('');
     document.getElementById('f_imageFile').value = '';
     document.getElementById('f_imagePreview').style.display = 'none';
     document.getElementById('uploadStatus').textContent = '';
@@ -313,7 +361,7 @@
     document.getElementById('f_titleEn').value = row[0] || '';
     document.getElementById('f_titleZh').value = row[1] || '';
     document.getElementById('f_date').value = row[2] || '';
-    document.getElementById('f_time').value = row[3] || '';
+    writeTimeFields(row[3] || '');
     document.getElementById('f_location').value = row[4] || '';
     document.getElementById('f_fee').value = row[5] || '';
     document.getElementById('f_contentEn').value = row[6] || '';
@@ -394,7 +442,7 @@
       document.getElementById('f_titleEn').value,
       document.getElementById('f_titleZh').value,
       document.getElementById('f_date').value,
-      document.getElementById('f_time').value,
+      readTimeFields(),
       document.getElementById('f_location').value,
       document.getElementById('f_fee').value,
       document.getElementById('f_contentEn').value,

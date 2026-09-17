@@ -347,8 +347,10 @@
         canvas.height = height;
         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
         const base64 = canvas.toDataURL('image/jpeg', 0.82).split(',')[1];
+        const sizeKB = Math.round(base64.length * 0.75 / 1024);
 
-        uploadStatus.textContent = 'Uploading… 上傳中…';
+        uploadStatus.textContent = `Uploading (${sizeKB}KB)… 上傳中…`;
+        const t0 = performance.now();
         fetch(API_URL, {
           method: 'POST',
           body: JSON.stringify({
@@ -371,7 +373,10 @@
             preview.style.display = 'block';
             uploadStatus.textContent = 'Uploaded ✓ 已上傳';
           })
-          .catch(err => { uploadStatus.textContent = 'Upload failed (network): ' + err.message; });
+          .catch(err => {
+            const elapsed = Math.round(performance.now() - t0);
+            uploadStatus.textContent = `Upload failed (network) after ${elapsed}ms, size ${sizeKB}KB: ${err.message}`;
+          });
       };
       img.onerror = () => { uploadStatus.textContent = "Couldn't read that image. 無法讀取這張圖片。"; };
       img.src = reader.result;

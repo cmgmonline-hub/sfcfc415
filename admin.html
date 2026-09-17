@@ -231,13 +231,16 @@
     statusEl.textContent = 'Loading… 載入中…';
     listEl.innerHTML = '';
     fetch(API_URL)
-      .then(res => res.json())
-      .then(data => {
+      .then(res => res.text())
+      .then(text => {
+        let data;
+        try { data = JSON.parse(text); }
+        catch (e) { statusEl.textContent = 'Load failed — server said: ' + text.slice(0, 200); return; }
         allRows = Array.isArray(data) ? data : [];
         statusEl.textContent = '';
         renderList();
       })
-      .catch(() => { statusEl.textContent = "Couldn't load the list. 無法載入清單。"; });
+      .catch(err => { statusEl.textContent = "Couldn't load the list (network): " + err.message; });
   }
 
   function renderList() {
@@ -306,8 +309,8 @@
     const row = allRows[sheetRow - 1] || [];
     document.getElementById('f_titleEn').value = row[0] || '';
     document.getElementById('f_titleZh').value = row[1] || '';
-    document.getElementById('f_date').value = toDateInputValue(row[2]);
-    document.getElementById('f_time').value = toTimeInputValue(row[3]);
+    document.getElementById('f_date').value = row[2] || '';
+    document.getElementById('f_time').value = row[3] || '';
     document.getElementById('f_location').value = row[4] || '';
     document.getElementById('f_fee').value = row[5] || '';
     document.getElementById('f_contentEn').value = row[6] || '';
@@ -317,20 +320,6 @@
     const preview = document.getElementById('f_imagePreview');
     if (row[9]) { preview.src = row[9]; preview.style.display = 'block'; } else { preview.style.display = 'none'; }
     openForm(sheetRow);
-  }
-
-  // Best-effort: only converts values Apps Script would hand back as plain strings/dates cleanly.
-  function toDateInputValue(v) {
-    if (!v) return '';
-    const d = new Date(v);
-    if (isNaN(d.getTime())) return '';
-    return d.toISOString().slice(0, 10);
-  }
-  function toTimeInputValue(v) {
-    if (!v) return '';
-    const d = new Date(v);
-    if (isNaN(d.getTime())) return '';
-    return d.toTimeString().slice(0, 5);
   }
 
   // --- image upload ---
@@ -352,16 +341,19 @@
           fileName: file.name
         })
       })
-        .then(res => res.json())
-        .then(data => {
-          if (data.error) { uploadStatus.textContent = data.error; return; }
+        .then(res => res.text())
+        .then(text => {
+          let data;
+          try { data = JSON.parse(text); }
+          catch (e) { uploadStatus.textContent = 'Upload failed — server said: ' + text.slice(0, 200); return; }
+          if (data.error) { uploadStatus.textContent = 'Upload failed: ' + data.error; return; }
           document.getElementById('f_imageUrl').value = data.url;
           const preview = document.getElementById('f_imagePreview');
           preview.src = data.url;
           preview.style.display = 'block';
           uploadStatus.textContent = 'Uploaded ✓ 已上傳';
         })
-        .catch(() => { uploadStatus.textContent = "Upload failed. 上傳失敗。"; });
+        .catch(err => { uploadStatus.textContent = 'Upload failed (network): ' + err.message; });
     };
     reader.readAsDataURL(file);
   });
@@ -386,22 +378,28 @@
 
     statusEl.textContent = 'Saving… 儲存中…';
     fetch(API_URL, { method: 'POST', body: JSON.stringify(body) })
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) { statusEl.textContent = data.error; return; }
+      .then(res => res.text())
+      .then(text => {
+        let data;
+        try { data = JSON.parse(text); }
+        catch (e) { statusEl.textContent = 'Save failed — server said: ' + text.slice(0, 200); return; }
+        if (data.error) { statusEl.textContent = 'Save failed: ' + data.error; return; }
         closeForm();
         loadList();
       })
-      .catch(() => { statusEl.textContent = 'Save failed. 儲存失敗。'; });
+      .catch(err => { statusEl.textContent = 'Save failed (network): ' + err.message; });
   }
 
   function deleteRow(sheetRow) {
     if (!confirm('Delete this announcement? 確定要刪除嗎？')) return;
     statusEl.textContent = 'Deleting… 刪除中…';
     fetch(API_URL, { method: 'POST', body: JSON.stringify({ pin: PIN, action: 'delete', rowIndex: sheetRow }) })
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) { statusEl.textContent = data.error; return; }
+      .then(res => res.text())
+      .then(text => {
+        let data;
+        try { data = JSON.parse(text); }
+        catch (e) { statusEl.textContent = 'Delete failed — server said: ' + text.slice(0, 200); return; }
+        if (data.error) { statusEl.textContent = 'Delete failed: ' + data.error; return; }
         loadList();
       })
       .catch(() => { statusEl.textContent = 'Delete failed. 刪除失敗。'; });

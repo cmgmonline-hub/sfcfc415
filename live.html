@@ -362,7 +362,29 @@
     letter-spacing: 0.06em;
     color: var(--cyan);
     text-transform: uppercase;
-    margin: 0 0 6px;
+    margin: 4px 0 8px;
+  }
+  .live-announcements__title-en{
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  .live-announcements__title-zh{
+    font-family: "Noto Sans TC", sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0.7;
+    margin: 2px 0 0;
+  }
+  .live-announcements__content-en{
+    margin: 0;
+  }
+  .live-announcements__content-zh{
+    font-family: "Noto Sans TC", sans-serif;
+    font-size: 0.92em;
+    opacity: 0.8;
+    margin: 6px 0 0;
   }
   .live-card p{ color: var(--ink-dim); font-size: 0.9rem; margin: 0; }
   .live-card__link{
@@ -511,7 +533,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.37 · updated 2026-09-16</p>
+  <p class="live-version">v1.38 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -577,9 +599,11 @@
           const titleEn = get(0), titleZh = get(1), dateTime = get(2), contentEn = get(3), contentZh = get(4);
           return `
             <div class="live-card">
+              ${titleEn ? `<p class="live-announcements__title-en">${titleEn}</p>` : ''}
+              ${titleZh ? `<p class="live-announcements__title-zh">${titleZh}</p>` : ''}
               ${dateTime ? `<p class="live-announcements__date">${dateTime}</p>` : ''}
-              <h3>${titleEn}${titleZh ? ` <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">${titleZh}</span>` : ''}</h3>
-              <p>${contentEn}${contentZh ? `<span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">${contentZh}</span>` : ''}</p>
+              ${contentEn ? `<p class="live-announcements__content-en">${contentEn}</p>` : ''}
+              ${contentZh ? `<p class="live-announcements__content-zh">${contentZh}</p>` : ''}
             </div>`;
         }).join('');
       })

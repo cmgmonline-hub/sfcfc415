@@ -556,7 +556,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.51 · updated 2026-09-16</p>
+  <p class="live-version">v1.52 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -597,7 +597,7 @@
   if (introEventBtn) introEventBtn.addEventListener('click', () => goTo(2));
 
   // --- Arrange the 3 main buttons by day of week (Pacific Time) ---
-  // Sunday: Direction / Bulletin / Translation up front, Event / Donation / Devotion under "More"
+  // Sunday: Direction / Bulletin / Donation up front, Event / Translation / Devotion under "More"
   // Weekday (Mon–Sat): Direction / Devotion / Event up front, Bulletin / Translation / Donation under "More"
   (() => {
     const mainActionsEl = document.getElementById('mainActions');
@@ -616,10 +616,10 @@
     const isSunday = dayName === 'Sun';
 
     const mainOrder = isSunday
-      ? [btn.direction, btn.bulletin, btn.translation]
+      ? [btn.direction, btn.bulletin, btn.donation]
       : [btn.direction, btn.devotion, btn.event];
     const moreOrder = isSunday
-      ? [btn.event, btn.donation, btn.devotion]
+      ? [btn.event, btn.translation, btn.devotion]
       : [btn.bulletin, btn.translation, btn.donation];
 
     mainOrder.forEach(el => mainActionsEl.appendChild(el));

@@ -356,6 +356,11 @@
     font-size: 0.85rem;
     padding: 24px 0;
   }
+  .live-card .live-announcements__meta{
+    margin: 4px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(70, 212, 222, 0.25);
+  }
   .live-card .live-announcements__date{
     font-family: var(--font-mono);
     font-size: 0.7rem;
@@ -363,9 +368,21 @@
     letter-spacing: 0.06em;
     color: var(--cyan);
     text-transform: uppercase;
-    margin: 4px 0 18px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(70, 212, 222, 0.25);
+    margin: 0 0 4px;
+  }
+  .live-card .live-announcements__location{
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    color: var(--ink-dim);
+    margin: 0;
+  }
+  .live-card .live-announcements__fee{
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    color: var(--ink-dim);
+    margin: 4px 0 0;
   }
   .live-card .live-announcements__title{
     font-family: var(--font-display);
@@ -556,7 +573,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.53 · updated 2026-09-16</p>
+  <p class="live-version">v1.56 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -628,7 +645,7 @@
 
   // --- Announcements, loaded from a public Google Sheet ---
   // Setup: create a Google Sheet with columns in this order —
-  //   Title EN | Title ZH | Date/Time | Content EN | Content ZH | Link (optional) | Image URL (optional)
+  //   Title EN | Title ZH | Date/Time | Location (optional) | Fee 費用 (optional) | Content EN | Content ZH | Link (optional) | Image URL (optional)
   // Share it as "Anyone with the link can view", then put its ID below
   // (the long ID in the sheet's URL between /d/ and /edit).
   const ANNOUNCEMENTS_SHEET_ID = '1F2atc-BBJk5llQX5u_BSTQ73jhRbZ6Ns5XyNe47IAP8';
@@ -668,12 +685,17 @@
         announcementsListEl.innerHTML = rows.map(row => {
           const cells = row.c || [];
           const get = i => (cells[i] && cells[i].v != null) ? cells[i].v : '';
-          const titleEn = get(0), titleZh = get(1), dateTime = formatSheetDate(get(2)), contentEn = get(3), contentZh = get(4), link = get(5), image = get(6);
+          const titleEn = get(0), titleZh = get(1), dateTime = formatSheetDate(get(2)), location = get(3), fee = get(4), contentEn = get(5), contentZh = get(6), link = get(7), image = get(8);
+          const hasMeta = dateTime || location || fee;
           return `
             <div class="live-card">
               ${image ? `<img src="${image}" alt="" class="live-announcements__image" loading="lazy" onerror="this.style.display='none'">` : ''}
               ${(titleEn || titleZh) ? `<p class="live-announcements__title">${titleEn}${titleZh ? ` <span class="live-announcements__title-zh">${titleZh}</span>` : ''}</p>` : ''}
-              ${dateTime ? `<p class="live-announcements__date">${dateTime}</p>` : ''}
+              ${hasMeta ? `<div class="live-announcements__meta">
+                ${dateTime ? `<p class="live-announcements__date">${dateTime}</p>` : ''}
+                ${location ? `<p class="live-announcements__location">📍 ${location}</p>` : ''}
+                ${fee ? `<p class="live-announcements__fee">💲 ${fee}</p>` : ''}
+              </div>` : ''}
               ${contentEn ? `<p class="live-announcements__content-en">${contentEn}</p>` : ''}
               ${contentZh ? `<p class="live-announcements__content-zh">${contentZh}</p>` : ''}
               ${link ? `<a href="${link}" target="_blank" rel="noopener" class="live-announcements__link">Learn More 了解更多 →</a>` : ''}

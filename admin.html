@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Announcements Admin · 報告事項後台</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=1.1">
+<style>
+  body{
+    background: var(--bg-deep);
+    color: var(--ink);
+    font-family: var(--font-body);
+    padding: 20px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  h1{
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    margin: 0 0 4px;
+  }
+  .subtitle{
+    color: var(--ink-dim);
+    font-size: 0.85rem;
+    margin: 0 0 24px;
+  }
+
+  /* --- PIN gate --- */
+  #pinGate{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 280px;
+    margin: 60px auto;
+    text-align: center;
+  }
+  #pinGate input{
+    text-align: center;
+    font-size: 1.4rem;
+    letter-spacing: 0.3em;
+    padding: 12px;
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    border-radius: 0;
+  }
+  #pinError{ color: #e05a5a; font-size: 0.82rem; min-height: 1.2em; }
+
+  /* --- shared controls --- */
+  .btn2{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: 1px solid var(--cyan);
+    background: rgba(70, 212, 222, 0.08);
+    color: var(--cyan);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn2:active{ background: rgba(70, 212, 222, 0.2); }
+  .btn2--danger{ border-color: #e05a5a; color: #e05a5a; background: rgba(224,90,90,0.08); }
+  .btn2--danger:active{ background: rgba(224,90,90,0.2); }
+  .btn2--ghost{ border-color: var(--line); color: var(--ink-dim); background: none; }
+
+  /* --- app shell (hidden until unlocked) --- */
+  #app{ display: none; }
+  .toolbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .header-toggle{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+  }
+
+  /* --- list --- */
+  #list{ display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .item{
+    background: var(--bg-panel-2);
+    border: 1px solid var(--line);
+    padding: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  .item__info{ min-width: 0; }
+  .item__title{ font-weight: 600; font-size: 0.95rem; overflow-wrap: anywhere; }
+  .item__date{ color: var(--cyan); font-family: var(--font-mono); font-size: 0.72rem; margin-top: 2px; }
+  .item__actions{ display: flex; gap: 6px; flex-shrink: 0; }
+  .item__actions .btn2{ padding: 6px 10px; font-size: 0.75rem; }
+  #status{ color: var(--ink-dim); font-size: 0.85rem; padding: 12px 0; }
+
+  /* --- form --- */
+  #formPanel{
+    display: none;
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    padding: 18px;
+    margin-bottom: 24px;
+  }
+  #formPanel h2{ font-size: 1rem; margin: 0 0 14px; }
+  .field{ margin-bottom: 14px; }
+  .field label{
+    display: block;
+    font-size: 0.75rem;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 5px;
+  }
+  .field input, .field textarea{
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--bg-panel-2);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 9px 10px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    border-radius: 0;
+  }
+  .field textarea{ min-height: 70px; resize: vertical; }
+  .row2{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .imgPreview{ max-width: 120px; display: block; margin-top: 8px; border-radius: 6px; }
+  .form-actions{ display: flex; gap: 10px; margin-top: 18px; }
+  #uploadStatus{ font-size: 0.78rem; color: var(--ink-dim); margin-top: 6px; }
+</style>
+</head>
+<body>
+
+  <div id="pinGate">
+    <h1>Announcements Admin</h1>
+    <p class="subtitle">報告事項後台</p>
+    <input type="password" id="pinInput" inputmode="numeric" placeholder="PIN">
+    <button class="btn2" id="unlockBtn">Unlock 解鎖</button>
+    <p id="pinError"></p>
+  </div>
+
+  <div id="app">
+    <h1>Announcements 報告事項</h1>
+    <p class="subtitle">Add, edit, or remove items — changes go straight to the Google Sheet.</p>
+
+    <div class="toolbar">
+      <button class="btn2" id="addNewBtn">+ Add New 新增</button>
+      <label class="header-toggle">
+        <input type="checkbox" id="hasHeaderToggle">
+        Sheet has header row 表格有標題列
+      </label>
+    </div>
+
+    <div id="formPanel">
+      <h2 id="formTitle">Add Announcement</h2>
+      <div class="row2">
+        <div class="field"><label>Title EN</label><input type="text" id="f_titleEn"></div>
+        <div class="field"><label>標題 ZH</label><input type="text" id="f_titleZh"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Date 日期</label><input type="date" id="f_date"></div>
+        <div class="field"><label>Time 時間</label><input type="time" id="f_time"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Location 地點</label><input type="text" id="f_location"></div>
+        <div class="field"><label>Fee 費用</label><input type="text" id="f_fee"></div>
+      </div>
+      <div class="field"><label>Content EN</label><textarea id="f_contentEn"></textarea></div>
+      <div class="field"><label>內容 ZH</label><textarea id="f_contentZh"></textarea></div>
+      <div class="field"><label>Link (optional)</label><input type="url" id="f_link" placeholder="https://"></div>
+      <div class="field">
+        <label>Image 圖片 (optional)</label>
+        <input type="file" id="f_imageFile" accept="image/*">
+        <input type="hidden" id="f_imageUrl">
+        <img id="f_imagePreview" class="imgPreview" style="display:none">
+        <p id="uploadStatus"></p>
+      </div>
+      <div class="form-actions">
+        <button class="btn2" id="saveBtn">Save 儲存</button>
+        <button class="btn2 btn2--ghost" id="cancelBtn">Cancel 取消</button>
+      </div>
+    </div>
+
+    <div id="status"></div>
+    <div id="list"></div>
+  </div>
+
+<script>
+  // TODO: this is your Apps Script Web App URL from the deployment step
+  const API_URL = 'https://script.google.com/macros/s/AKfycbyD4wJoqQyip5E1i-JY4-JWYSbakngHNSpK1s8Sn0rNlZBqSFftzoxAlivqaXnPvRc3/exec';
+
+  let PIN = '';
+  let allRows = [];      // raw rows exactly as the sheet returns them
+  let editingRowIndex = null; // 1-based sheet row currently being edited, or null when adding
+
+  const pinGate = document.getElementById('pinGate');
+  const app = document.getElementById('app');
+  const pinInput = document.getElementById('pinInput');
+  const pinError = document.getElementById('pinError');
+  const hasHeaderToggle = document.getElementById('hasHeaderToggle');
+  const listEl = document.getElementById('list');
+  const statusEl = document.getElementById('status');
+  const formPanel = document.getElementById('formPanel');
+  const formTitle = document.getElementById('formTitle');
+
+  document.getElementById('unlockBtn').addEventListener('click', unlock);
+  pinInput.addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+
+  function unlock() {
+    const val = pinInput.value.trim();
+    if (!val) { pinError.textContent = 'Enter your PIN 請輸入 PIN'; return; }
+    PIN = val;
+    pinGate.style.display = 'none';
+    app.style.display = 'block';
+    loadList();
+  }
+
+  hasHeaderToggle.addEventListener('change', renderList);
+
+  function loadList() {
+    statusEl.textContent = 'Loading… 載入中…';
+    listEl.innerHTML = '';
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => {
+        allRows = Array.isArray(data) ? data : [];
+        statusEl.textContent = '';
+        renderList();
+      })
+      .catch(() => { statusEl.textContent = "Couldn't load the list. 無法載入清單。"; });
+  }
+
+  function renderList() {
+    const skip = hasHeaderToggle.checked ? 1 : 0;
+    const items = allRows.slice(skip);
+    if (!items.length) {
+      listEl.innerHTML = '';
+      statusEl.textContent = 'No announcements yet. 目前沒有報告事項。';
+      return;
+    }
+    statusEl.textContent = '';
+    listEl.innerHTML = items.map((row, i) => {
+      const sheetRow = i + skip + 1; // 1-based actual sheet row
+      const titleEn = row[0] || '(untitled)';
+      const titleZh = row[1] || '';
+      const date = row[2] || '';
+      const time = row[3] || '';
+      return `
+        <div class="item">
+          <div class="item__info">
+            <div class="item__title">${escapeHtml(titleEn)}${titleZh ? ' ' + escapeHtml(titleZh) : ''}</div>
+            ${(date || time) ? `<div class="item__date">${escapeHtml([date, time].filter(Boolean).join(' '))}</div>` : ''}
+          </div>
+          <div class="item__actions">
+            <button class="btn2" data-edit="${sheetRow}">Edit</button>
+            <button class="btn2 btn2--danger" data-delete="${sheetRow}">Delete</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    listEl.querySelectorAll('[data-edit]').forEach(btn => {
+      btn.addEventListener('click', () => openEdit(parseInt(btn.dataset.edit, 10)));
+    });
+    listEl.querySelectorAll('[data-delete]').forEach(btn => {
+      btn.addEventListener('click', () => deleteRow(parseInt(btn.dataset.delete, 10)));
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // --- add / edit form ---
+  document.getElementById('addNewBtn').addEventListener('click', () => openForm(null));
+  document.getElementById('cancelBtn').addEventListener('click', closeForm);
+  document.getElementById('saveBtn').addEventListener('click', save);
+
+  function openForm(rowIndex) {
+    editingRowIndex = rowIndex;
+    formTitle.textContent = rowIndex ? 'Edit Announcement' : 'Add Announcement';
+    formPanel.style.display = 'block';
+    formPanel.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function closeForm() {
+    formPanel.style.display = 'none';
+    editingRowIndex = null;
+    ['f_titleEn','f_titleZh','f_date','f_time','f_location','f_fee','f_contentEn','f_contentZh','f_link','f_imageUrl']
+      .forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f_imageFile').value = '';
+    document.getElementById('f_imagePreview').style.display = 'none';
+    document.getElementById('uploadStatus').textContent = '';
+  }
+
+  function openEdit(sheetRow) {
+    const row = allRows[sheetRow - 1] || [];
+    document.getElementById('f_titleEn').value = row[0] || '';
+    document.getElementById('f_titleZh').value = row[1] || '';
+    document.getElementById('f_date').value = toDateInputValue(row[2]);
+    document.getElementById('f_time').value = toTimeInputValue(row[3]);
+    document.getElementById('f_location').value = row[4] || '';
+    document.getElementById('f_fee').value = row[5] || '';
+    document.getElementById('f_contentEn').value = row[6] || '';
+    document.getElementById('f_contentZh').value = row[7] || '';
+    document.getElementById('f_link').value = row[8] || '';
+    document.getElementById('f_imageUrl').value = row[9] || '';
+    const preview = document.getElementById('f_imagePreview');
+    if (row[9]) { preview.src = row[9]; preview.style.display = 'block'; } else { preview.style.display = 'none'; }
+    openForm(sheetRow);
+  }
+
+  // Best-effort: only converts values Apps Script would hand back as plain strings/dates cleanly.
+  function toDateInputValue(v) {
+    if (!v) return '';
+    const d = new Date(v);
+    if (isNaN(d.getTime())) return '';
+    return d.toISOString().slice(0, 10);
+  }
+  function toTimeInputValue(v) {
+    if (!v) return '';
+    const d = new Date(v);
+    if (isNaN(d.getTime())) return '';
+    return d.toTimeString().slice(0, 5);
+  }
+
+  // --- image upload ---
+  document.getElementById('f_imageFile').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const uploadStatus = document.getElementById('uploadStatus');
+    uploadStatus.textContent = 'Uploading… 上傳中…';
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1];
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          pin: PIN,
+          action: 'uploadImage',
+          base64: base64,
+          mimeType: file.type,
+          fileName: file.name
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) { uploadStatus.textContent = data.error; return; }
+          document.getElementById('f_imageUrl').value = data.url;
+          const preview = document.getElementById('f_imagePreview');
+          preview.src = data.url;
+          preview.style.display = 'block';
+          uploadStatus.textContent = 'Uploaded ✓ 已上傳';
+        })
+        .catch(() => { uploadStatus.textContent = "Upload failed. 上傳失敗。"; });
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // --- save (add or update) ---
+  function save() {
+    const row = [
+      document.getElementById('f_titleEn').value,
+      document.getElementById('f_titleZh').value,
+      document.getElementById('f_date').value,
+      document.getElementById('f_time').value,
+      document.getElementById('f_location').value,
+      document.getElementById('f_fee').value,
+      document.getElementById('f_contentEn').value,
+      document.getElementById('f_contentZh').value,
+      document.getElementById('f_link').value,
+      document.getElementById('f_imageUrl').value
+    ];
+    const body = editingRowIndex
+      ? { pin: PIN, action: 'update', rowIndex: editingRowIndex, row: row }
+      : { pin: PIN, action: 'add', row: row };
+
+    statusEl.textContent = 'Saving… 儲存中…';
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(body) })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) { statusEl.textContent = data.error; return; }
+        closeForm();
+        loadList();
+      })
+      .catch(() => { statusEl.textContent = 'Save failed. 儲存失敗。'; });
+  }
+
+  function deleteRow(sheetRow) {
+    if (!confirm('Delete this announcement? 確定要刪除嗎？')) return;
+    statusEl.textContent = 'Deleting… 刪除中…';
+    fetch(API_URL, { method: 'POST', body: JSON.stringify({ pin: PIN, action: 'delete', rowIndex: sheetRow }) })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) { statusEl.textContent = data.error; return; }
+        loadList();
+      })
+      .catch(() => { statusEl.textContent = 'Delete failed. 刪除失敗。'; });
+  }
+</script>
+</body>
+</html>

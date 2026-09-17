@@ -323,38 +323,60 @@
   }
 
   // --- image upload ---
+  // Resize/compress in-browser first: a full-res iPhone photo can be several MB,
+  // which as base64 is large enough to fail ("Load failed") over some mobile
+  // connections. Shrinking to a max 1600px JPEG keeps uploads small and reliable.
   document.getElementById('f_imageFile').addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) return;
     const uploadStatus = document.getElementById('uploadStatus');
-    uploadStatus.textContent = 'Uploading… 上傳中…';
+    uploadStatus.textContent = 'Preparing image… 處理圖片中…';
+
     const reader = new FileReader();
     reader.onload = () => {
-      const base64 = reader.result.split(',')[1];
-      fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({
-          pin: PIN,
-          action: 'uploadImage',
-          base64: base64,
-          mimeType: file.type,
-          fileName: file.name
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 1600;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) { height = Math.round(height * maxDim / width); width = maxDim; }
+          else { width = Math.round(width * maxDim / height); height = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        const base64 = canvas.toDataURL('image/jpeg', 0.82).split(',')[1];
+
+        uploadStatus.textContent = 'Uploading… 上傳中…';
+        fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            pin: PIN,
+            action: 'uploadImage',
+            base64: base64,
+            mimeType: 'image/jpeg',
+            fileName: (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg'
+          })
         })
-      })
-        .then(res => res.text())
-        .then(text => {
-          let data;
-          try { data = JSON.parse(text); }
-          catch (e) { uploadStatus.textContent = 'Upload failed — server said: ' + text.slice(0, 200); return; }
-          if (data.error) { uploadStatus.textContent = 'Upload failed: ' + data.error; return; }
-          document.getElementById('f_imageUrl').value = data.url;
-          const preview = document.getElementById('f_imagePreview');
-          preview.src = data.url;
-          preview.style.display = 'block';
-          uploadStatus.textContent = 'Uploaded ✓ 已上傳';
-        })
-        .catch(err => { uploadStatus.textContent = 'Upload failed (network): ' + err.message; });
+          .then(res => res.text())
+          .then(text => {
+            let data;
+            try { data = JSON.parse(text); }
+            catch (e) { uploadStatus.textContent = 'Upload failed — server said: ' + text.slice(0, 200); return; }
+            if (data.error) { uploadStatus.textContent = 'Upload failed: ' + data.error; return; }
+            document.getElementById('f_imageUrl').value = data.url;
+            const preview = document.getElementById('f_imagePreview');
+            preview.src = data.url;
+            preview.style.display = 'block';
+            uploadStatus.textContent = 'Uploaded ✓ 已上傳';
+          })
+          .catch(err => { uploadStatus.textContent = 'Upload failed (network): ' + err.message; });
+      };
+      img.onerror = () => { uploadStatus.textContent = "Couldn't read that image. 無法讀取這張圖片。"; };
+      img.src = reader.result;
     };
+    reader.onerror = () => { uploadStatus.textContent = "Couldn't read that file. 無法讀取檔案。"; };
     reader.readAsDataURL(file);
   });
 

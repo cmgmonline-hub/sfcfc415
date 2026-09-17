@@ -202,13 +202,6 @@
     padding: 10px 22px;
     color: var(--cyan);
   }
-  .live-clock__zone{
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    opacity: 0.7;
-  }
   .live-clock__time{
     font-family: var(--font-mono);
     font-size: 2.1rem;
@@ -418,7 +411,6 @@
         <div class="live-header">
           <img src="assets/SFCFC-logo.png?v=2" alt="City Mission logo" class="live-logo">
           <div class="live-clock" id="liveClock">
-            <span class="live-clock__zone">Pacific Time · PT</span>
             <span class="live-clock__time" id="liveClockTime">--:--</span>
             <span class="live-clock__date" id="liveClockDate">-- --- ----</span>
             <span class="live-clock__weather" id="liveClockWeather"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/></svg><span id="liveClockWeatherText">San Francisco · --°F</span></span>
@@ -513,7 +505,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.29 · updated 2026-09-16</p>
+  <p class="live-version">v1.30 · updated 2026-09-16</p>
 </div>
 
 <script>

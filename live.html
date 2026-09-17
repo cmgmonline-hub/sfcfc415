@@ -576,7 +576,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.60 · updated 2026-09-16</p>
+  <p class="live-version">v1.61 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -648,7 +648,7 @@
 
   // --- Announcements, loaded from a public Google Sheet ---
   // Setup: create a Google Sheet with columns in this order —
-  //   Title EN | Title ZH | Date/Time | Location (optional) | Fee 費用 (optional) | Content EN | Content ZH | Link (optional) | Image URL (optional)
+  //   Title EN | Title ZH | Date | Time | Location (optional) | Fee 費用 (optional) | Content EN | Content ZH | Link (optional) | Image URL (optional)
   // Share it as "Anyone with the link can view", then put its ID below
   // (the long ID in the sheet's URL between /d/ and /edit).
   const ANNOUNCEMENTS_SHEET_ID = '1F2atc-BBJk5llQX5u_BSTQ73jhRbZ6Ns5XyNe47IAP8';
@@ -663,39 +663,56 @@
         const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
         const allRows = json.table.rows || [];
 
-        // Parses the raw Date/Time cell into a real JS Date for sorting/filtering.
-        // Handles Google's "Date(y,m,d,h,mi,s)" format (real date/time cells) and
-        // falls back to the browser's own date parser for plain typed text —
-        // if that also fails, returns null (unknown date: never filtered out,
-        // sorted to the end).
-        const parseSheetDate = raw => {
+        // Parses a single "Date(y,m,d,h,mi,s)" gviz cell into its raw parts.
+        // (A Sheets Date column returns Date(y,m,d); a Time-only column returns
+        // Date(1899,11,30,h,mi,s) — we only use the h/mi from that one.)
+        const parseGvizParts = raw => {
           if (typeof raw !== 'string' || !raw) return null;
           const m = raw.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+))?/);
-          if (m) {
-            const [, y, mo, d, h = '0', mi = '0'] = m;
-            return new Date(+y, +mo, +d, +h, +mi);
+          if (!m) return null;
+          const [, y, mo, d, h = '0', mi = '0'] = m;
+          return { y: +y, mo: +mo, d: +d, h: +h, mi: +mi };
+        };
+
+        // Combines the separate Date and Time cells into one real JS Date for
+        // sorting/filtering. Falls back to the browser's own date parser when
+        // either cell is plain typed text rather than a real date/time value.
+        // Returns null when nothing usable is found (never filtered out,
+        // sorted to the end).
+        const combineDateTime = (dateRaw, timeRaw) => {
+          const dateParts = parseGvizParts(dateRaw);
+          const timeParts = parseGvizParts(timeRaw);
+          if (dateParts) {
+            return new Date(dateParts.y, dateParts.mo, dateParts.d, timeParts ? timeParts.h : 0, timeParts ? timeParts.mi : 0);
           }
-          const parsed = new Date(raw);
+          const combinedText = [dateRaw, timeRaw].filter(Boolean).join(' ');
+          if (!combinedText) return null;
+          const parsed = new Date(combinedText);
           return isNaN(parsed.getTime()) ? null : parsed;
         };
 
-        // Reformats a real Date/Time cell to mm-dd-yyyy (Ddd) h:mmAM/PM.
-        // Plain text typed directly in the sheet is left exactly as typed.
-        const formatSheetDate = raw => {
-          if (typeof raw !== 'string') return raw;
-          const m = raw.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+))?/);
-          if (!m) return raw;
-          const [, y, mo, d, h = '0', mi = '0'] = m;
-          const dt = new Date(+y, +mo, +d, +h, +mi);
-          const mm = String(dt.getMonth() + 1).padStart(2, '0');
-          const dd = String(dt.getDate()).padStart(2, '0');
-          const weekday = dt.toLocaleDateString('en-US', { weekday: 'short' });
-          const hasTime = h !== '0' || mi !== '0';
-          if (!hasTime) return `${mm}-${dd}-${dt.getFullYear()} (${weekday})`;
-          let hours = dt.getHours() % 12; if (hours === 0) hours = 12;
-          const minutes = String(dt.getMinutes()).padStart(2, '0');
-          const ampm = dt.getHours() >= 12 ? 'PM' : 'AM';
-          return `${mm}-${dd}-${dt.getFullYear()} (${weekday}) ${hours}:${minutes}${ampm}`;
+        // Formats the Date + Time cells for display: mm-dd-yyyy (Ddd) h:mmAM/PM.
+        // Plain typed text is passed through as-is (joined together).
+        const formatDateTime = (dateRaw, timeRaw) => {
+          const dateParts = parseGvizParts(dateRaw);
+          const timeParts = parseGvizParts(timeRaw);
+          if (dateParts) {
+            const dt = new Date(dateParts.y, dateParts.mo, dateParts.d);
+            const mm = String(dt.getMonth() + 1).padStart(2, '0');
+            const dd = String(dt.getDate()).padStart(2, '0');
+            const weekday = dt.toLocaleDateString('en-US', { weekday: 'short' });
+            let out = `${mm}-${dd}-${dt.getFullYear()} (${weekday})`;
+            if (timeParts) {
+              let hours = timeParts.h % 12; if (hours === 0) hours = 12;
+              const minutes = String(timeParts.mi).padStart(2, '0');
+              const ampm = timeParts.h >= 12 ? 'PM' : 'AM';
+              out += ` ${hours}:${minutes}${ampm}`;
+            } else if (typeof timeRaw === 'string' && timeRaw) {
+              out += ` ${timeRaw}`;
+            }
+            return out;
+          }
+          return [dateRaw, timeRaw].filter(Boolean).join(' ');
         };
 
         // Drop past announcements, then sort what's left soonest-first.
@@ -705,7 +722,8 @@
         const withDates = allRows.map(row => {
           const cells = row.c || [];
           const rawDate = (cells[2] && cells[2].v != null) ? cells[2].v : '';
-          return { row, parsedDate: parseSheetDate(rawDate) };
+          const rawTime = (cells[3] && cells[3].v != null) ? cells[3].v : '';
+          return { row, parsedDate: combineDateTime(rawDate, rawTime) };
         });
         const rows = withDates
           .filter(r => !r.parsedDate || r.parsedDate >= startOfToday)
@@ -724,7 +742,7 @@
         announcementsListEl.innerHTML = rows.map(row => {
           const cells = row.c || [];
           const get = i => (cells[i] && cells[i].v != null) ? cells[i].v : '';
-          const titleEn = get(0), titleZh = get(1), dateTime = formatSheetDate(get(2)), location = get(3), fee = get(4), contentEn = get(5), contentZh = get(6), link = get(7), image = get(8);
+          const titleEn = get(0), titleZh = get(1), dateTime = formatDateTime(get(2), get(3)), location = get(4), fee = get(5), contentEn = get(6), contentZh = get(7), link = get(8), image = get(9);
           const hasMeta = dateTime || location || fee;
           return `
             <div class="live-card">

@@ -374,11 +374,20 @@
     color: transparent;
   }
   .live-card .live-announcements__location{
+    display: flex;
+    align-items: center;
+    gap: 5px;
     font-family: var(--font-mono);
     font-size: 0.72rem;
     letter-spacing: 0.03em;
     color: var(--ink-dim);
     margin: 0;
+  }
+  .live-card .live-announcements__location svg{
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    stroke: var(--cyan);
   }
   .live-card .live-announcements__location a{
     color: var(--cyan);
@@ -579,7 +588,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.62 · updated 2026-09-16</p>
+  <p class="live-version">v1.63 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -753,7 +762,7 @@
               ${(titleEn || titleZh) ? `<p class="live-announcements__title">${titleEn}${titleZh ? ` <span class="live-announcements__title-zh">${titleZh}</span>` : ''}</p>` : ''}
               ${hasMeta ? `<div class="live-announcements__meta">
                 ${dateTime ? `<p class="live-announcements__date">${dateTime}</p>` : ''}
-                ${location ? `<p class="live-announcements__location">📍 <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}" target="_blank" rel="noopener">${location}</a></p>` : ''}
+                ${location ? `<p class="live-announcements__location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.58 7-12a7 7 0 1 0-14 0c0 4.42 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg> <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}" target="_blank" rel="noopener">${location}</a></p>` : ''}
                 ${fee ? `<p class="live-announcements__fee">💲 ${fee}</p>` : ''}
               </div>` : ''}
               ${contentEn ? `<p class="live-announcements__content-en">${contentEn}</p>` : ''}

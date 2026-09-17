@@ -350,6 +350,20 @@
     margin: 0 0 8px;
   }
   .live-card h3{ font-family: var(--font-display); font-size: 1.05rem; margin: 0 0 6px; }
+  .live-announcements__status{
+    text-align: center;
+    color: var(--ink-dim);
+    font-size: 0.85rem;
+    padding: 24px 0;
+  }
+  .live-announcements__date{
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
   .live-card p{ color: var(--ink-dim); font-size: 0.9rem; margin: 0; }
   .live-card__link{
     display:inline-block;
@@ -466,24 +480,13 @@
       </div>
     </section>
 
-    <!-- Slide 3: What We Do -->
+    <!-- Slide 3: Announcements -->
     <section class="live-slide live-slide--scroll">
       <div class="live-slide__inner">
-        <p class="section-label section-label--center">What We Do 我們的事工</p>
-        <div class="live-card">
-          <h3>Sunday Worship <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">主日崇拜</span></h3>
-          <p>Join us every Sunday at 10:00am for worship in Chinese and English, as one congregation across generations.
-          <span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">歡迎你每主日早上10:00與我們一同敬拜，跨越語言與世代，成為同一個大家庭。</span></p>
-        </div>
-        <div class="live-card">
-          <h3>Small Groups & Fellowship <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">團契小組</span></h3>
-          <p>Weekly small groups where you can build real relationships, study Scripture, and pray together.
-          <span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">每週的團契小組，讓你建立真實的關係、一同查經與禱告。</span></p>
-        </div>
-        <div class="live-card">
-          <h3>Community Outreach <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">社區外展</span></h3>
-          <p>Serving our Geneva Avenue neighbors through outreach and mercy ministry — living out our calling as a mission to San Francisco.
-          <span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">透過外展服事與憐憫事工，服事Geneva Avenue一帶的鄰舍，活出我們對三藩市的使命。</span></p>
+        <p class="section-label section-label--center">Announcements 報告事項</p>
+        <!-- Announcements are loaded from the church's Google Sheet (see script below) -->
+        <div id="announcementsList" class="live-announcements">
+          <p class="live-announcements__status">Loading announcements… 載入中…</p>
         </div>
       </div>
     </section>
@@ -508,7 +511,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.35 · updated 2026-09-16</p>
+  <p class="live-version">v1.37 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -547,6 +550,45 @@
 
   const introEventBtn = document.getElementById('introEventBtn');
   if (introEventBtn) introEventBtn.addEventListener('click', () => goTo(2));
+
+  // --- Announcements, loaded from a public Google Sheet ---
+  // Setup: create a Google Sheet with columns in this order —
+  //   Title EN | Title ZH | Date/Time | Content EN | Content ZH
+  // Share it as "Anyone with the link can view", then put its ID below
+  // (the long ID in the sheet's URL between /d/ and /edit).
+  const ANNOUNCEMENTS_SHEET_ID = '1F2atc-BBJk5llQX5u_BSTQ73jhRbZ6Ns5XyNe47IAP8';
+
+  const announcementsListEl = document.getElementById('announcementsList');
+  if (announcementsListEl && ANNOUNCEMENTS_SHEET_ID !== 'SHEET_ID_HERE') {
+    const sheetUrl = `https://docs.google.com/spreadsheets/d/${ANNOUNCEMENTS_SHEET_ID}/gviz/tq?tqx=out:json`;
+    fetch(sheetUrl)
+      .then(res => res.text())
+      .then(text => {
+        // Google wraps the JSON in "google.visualization.Query.setResponse(...)"
+        const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
+        const rows = json.table.rows || [];
+        if (!rows.length) {
+          announcementsListEl.innerHTML = '<p class="live-announcements__status">No announcements right now. 目前沒有報告事項。</p>';
+          return;
+        }
+        announcementsListEl.innerHTML = rows.map(row => {
+          const cells = row.c || [];
+          const get = i => (cells[i] && cells[i].v != null) ? cells[i].v : '';
+          const titleEn = get(0), titleZh = get(1), dateTime = get(2), contentEn = get(3), contentZh = get(4);
+          return `
+            <div class="live-card">
+              ${dateTime ? `<p class="live-announcements__date">${dateTime}</p>` : ''}
+              <h3>${titleEn}${titleZh ? ` <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">${titleZh}</span>` : ''}</h3>
+              <p>${contentEn}${contentZh ? `<span style="display:block;margin-top:6px;font-size:0.92em;opacity:0.8;font-family:'Noto Sans TC',sans-serif;">${contentZh}</span>` : ''}</p>
+            </div>`;
+        }).join('');
+      })
+      .catch(() => {
+        announcementsListEl.innerHTML = '<p class="live-announcements__status">Couldn\'t load announcements right now. 暫時無法載入報告事項。</p>';
+      });
+  } else if (announcementsListEl) {
+    announcementsListEl.innerHTML = '<p class="live-announcements__status">Announcements are not set up yet.</p>';
+  }
 
   const moreToggleBtn = document.getElementById('moreToggleBtn');
   const moreActions = document.getElementById('moreActions');

@@ -576,7 +576,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.58 · updated 2026-09-16</p>
+  <p class="live-version">v1.60 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -661,14 +661,26 @@
       .then(text => {
         // Google wraps the JSON in "google.visualization.Query.setResponse(...)"
         const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
-        const rows = json.table.rows || [];
-        if (!rows.length) {
-          announcementsListEl.innerHTML = '<p class="live-announcements__status">No announcements right now. 目前沒有報告事項。</p>';
-          return;
-        }
-        // If the sheet column is a real Date/Time (not plain text), Google returns it
-        // as "Date(year,month,day,hour,minute,second)" — reformat that to mm-dd-yyyy (Ddd) h:mmAM/PM.
-        // Plain text entered directly in the sheet is left exactly as typed.
+        const allRows = json.table.rows || [];
+
+        // Parses the raw Date/Time cell into a real JS Date for sorting/filtering.
+        // Handles Google's "Date(y,m,d,h,mi,s)" format (real date/time cells) and
+        // falls back to the browser's own date parser for plain typed text —
+        // if that also fails, returns null (unknown date: never filtered out,
+        // sorted to the end).
+        const parseSheetDate = raw => {
+          if (typeof raw !== 'string' || !raw) return null;
+          const m = raw.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+))?/);
+          if (m) {
+            const [, y, mo, d, h = '0', mi = '0'] = m;
+            return new Date(+y, +mo, +d, +h, +mi);
+          }
+          const parsed = new Date(raw);
+          return isNaN(parsed.getTime()) ? null : parsed;
+        };
+
+        // Reformats a real Date/Time cell to mm-dd-yyyy (Ddd) h:mmAM/PM.
+        // Plain text typed directly in the sheet is left exactly as typed.
         const formatSheetDate = raw => {
           if (typeof raw !== 'string') return raw;
           const m = raw.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+))?/);
@@ -685,6 +697,30 @@
           const ampm = dt.getHours() >= 12 ? 'PM' : 'AM';
           return `${mm}-${dd}-${dt.getFullYear()} (${weekday}) ${hours}:${minutes}${ampm}`;
         };
+
+        // Drop past announcements, then sort what's left soonest-first.
+        // Rows with no date, or a date we can't parse, are always kept and sorted to the end.
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const withDates = allRows.map(row => {
+          const cells = row.c || [];
+          const rawDate = (cells[2] && cells[2].v != null) ? cells[2].v : '';
+          return { row, parsedDate: parseSheetDate(rawDate) };
+        });
+        const rows = withDates
+          .filter(r => !r.parsedDate || r.parsedDate >= startOfToday)
+          .sort((a, b) => {
+            if (!a.parsedDate && !b.parsedDate) return 0;
+            if (!a.parsedDate) return 1;
+            if (!b.parsedDate) return -1;
+            return a.parsedDate - b.parsedDate;
+          })
+          .map(r => r.row);
+
+        if (!rows.length) {
+          announcementsListEl.innerHTML = '<p class="live-announcements__status">No announcements right now. 目前沒有報告事項。</p>';
+          return;
+        }
         announcementsListEl.innerHTML = rows.map(row => {
           const cells = row.c || [];
           const get = i => (cells[i] && cells[i].v != null) ? cells[i].v : '';

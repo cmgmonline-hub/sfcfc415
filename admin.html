@@ -137,6 +137,7 @@
   .imgPreview{ max-width: 120px; display: block; margin-top: 8px; border-radius: 6px; }
   .form-actions{ display: flex; gap: 10px; margin-top: 18px; }
   #uploadStatus{ font-size: 0.78rem; color: var(--ink-dim); margin-top: 6px; }
+  .admin-version{ text-align: center; font-size: 0.7rem; opacity: 0.45; margin-top: 30px; font-family: var(--font-mono); }
 </style>
 </head>
 <body>
@@ -193,11 +194,12 @@
 
     <div id="status"></div>
     <div id="list"></div>
+    <p class="admin-version">v1.0 · updated 2026-09-16</p>
   </div>
 
 <script>
   // TODO: this is your Apps Script Web App URL from the deployment step
-  const API_URL = 'https://script.google.com/macros/s/AKfycbyD4wJoqQyip5E1i-JY4-JWYSbakngHNSpK1s8Sn0rNlZBqSFftzoxAlivqaXnPvRc3/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzyXJwnsJHxz9jCMDAEnXRJnQLkN-l7ViMg_Z9tCjNjATrZgaRNZqh_VQjmgqRj-mZa/exec';
 
   let PIN = '';
   let allRows = [];      // raw rows exactly as the sheet returns them

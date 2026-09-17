@@ -478,8 +478,8 @@
             <span class="live-clock__weather" id="liveClockWeather"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/></svg><span id="liveClockWeatherText">San Francisco · --°F</span></span>
           </div>
         </div>
-        <div class="live-intro-actions">
-          <a href="https://www.google.com/maps/search/?api=1&query=66+Geneva+Ave%2C+San+Francisco%2C+CA+94112" target="_blank" rel="noopener" class="btn btn--ghost">
+        <div class="live-intro-actions" id="mainActions">
+          <a href="https://www.google.com/maps/search/?api=1&query=66+Geneva+Ave%2C+San+Francisco%2C+CA+94112" target="_blank" rel="noopener" class="btn btn--ghost" id="introDirectionBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.58 7-12a7 7 0 1 0-14 0c0 4.42 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
             <span class="btn__label">Direction<br>地址</span>
           </a>
@@ -488,7 +488,7 @@
             <span class="btn__label">Bulletin<br>週刊</span>
           </button>
           <!-- TODO: replace with the real Zoom meeting link -->
-          <a href="YOUR_ZOOM_LINK_HERE" target="_blank" rel="noopener" class="btn btn--ghost">
+          <a href="YOUR_ZOOM_LINK_HERE" target="_blank" rel="noopener" class="btn btn--ghost" id="introTranslationBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 6 4 9s-1.5 6.5-4 9c-2.5-2.5-4-6-4-9s1.5-6.5 4-9z"/></svg>
             <span class="btn__label">Translation<br>翻譯</span>
           </a>
@@ -505,12 +505,12 @@
             <span class="btn__label">Event<br>活動</span>
           </button>
           <!-- TODO: replace with the real donation/giving link -->
-          <a href="YOUR_DONATION_LINK_HERE" target="_blank" rel="noopener" class="btn btn--ghost">
+          <a href="YOUR_DONATION_LINK_HERE" target="_blank" rel="noopener" class="btn btn--ghost" id="introDonationBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.35-9-8.5C1 7.5 3 4.5 6.5 4.5c1.9 0 3.4 1.1 4.3 2.5.9-1.4 2.4-2.5 4.3-2.5C18.6 4.5 21 7.5 20 11.5 18 15.65 12 20 12 20z"/></svg>
             <span class="btn__label">Donation<br>奉獻</span>
           </a>
           <!-- TODO: replace with the real devotion/devotional-reading link -->
-          <a href="YOUR_DEVOTION_LINK_HERE" target="_blank" rel="noopener" class="btn btn--ghost">
+          <a href="YOUR_DEVOTION_LINK_HERE" target="_blank" rel="noopener" class="btn btn--ghost" id="introDevotionBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5c3-1.5 6-1.5 8 0v14c-2-1.5-5-1.5-8 0V5z"/><path d="M20 5c-3-1.5-6-1.5-8 0v14c2-1.5 5-1.5 8 0V5z"/></svg>
             <span class="btn__label">Devotion<br>靈修</span>
           </a>
@@ -556,7 +556,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.50 · updated 2026-09-16</p>
+  <p class="live-version">v1.51 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -595,6 +595,36 @@
 
   const introEventBtn = document.getElementById('introEventBtn');
   if (introEventBtn) introEventBtn.addEventListener('click', () => goTo(2));
+
+  // --- Arrange the 3 main buttons by day of week (Pacific Time) ---
+  // Sunday: Direction / Bulletin / Translation up front, Event / Donation / Devotion under "More"
+  // Weekday (Mon–Sat): Direction / Devotion / Event up front, Bulletin / Translation / Donation under "More"
+  (() => {
+    const mainActionsEl = document.getElementById('mainActions');
+    const moreActionsEl = document.getElementById('moreActions');
+    const btn = {
+      direction: document.getElementById('introDirectionBtn'),
+      bulletin: document.getElementById('introBulletinBtn'),
+      translation: document.getElementById('introTranslationBtn'),
+      event: document.getElementById('introEventBtn'),
+      donation: document.getElementById('introDonationBtn'),
+      devotion: document.getElementById('introDevotionBtn')
+    };
+    if (!mainActionsEl || !moreActionsEl || Object.values(btn).some(el => !el)) return;
+
+    const dayName = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', weekday: 'short' }).format(new Date());
+    const isSunday = dayName === 'Sun';
+
+    const mainOrder = isSunday
+      ? [btn.direction, btn.bulletin, btn.translation]
+      : [btn.direction, btn.devotion, btn.event];
+    const moreOrder = isSunday
+      ? [btn.event, btn.donation, btn.devotion]
+      : [btn.bulletin, btn.translation, btn.donation];
+
+    mainOrder.forEach(el => mainActionsEl.appendChild(el));
+    moreOrder.forEach(el => moreActionsEl.appendChild(el));
+  })();
 
   // --- Announcements, loaded from a public Google Sheet ---
   // Setup: create a Google Sheet with columns in this order —

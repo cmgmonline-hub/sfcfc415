@@ -131,6 +131,7 @@
     font-family: var(--font-body);
     font-size: 0.9rem;
     border-radius: 0;
+    color-scheme: dark;
   }
   .field textarea{ min-height: 70px; resize: vertical; }
   .row2{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -195,7 +196,7 @@
     <div id="status"></div>
     <div id="list"></div>
   </div>
-  <p class="admin-version">v1.2 · updated 2026-09-16</p>
+  <p class="admin-version">v1.3 · updated 2026-09-16</p>
 
 <script>
   // TODO: this is your Apps Script Web App URL from the deployment step
@@ -401,11 +402,12 @@
       document.getElementById('f_link').value,
       document.getElementById('f_imageUrl').value
     ];
+    console.log('Saving row:', row);
+    statusEl.textContent = `Saving… date="${row[2]}" time="${row[3]}"`;
     const body = editingRowIndex
       ? { pin: PIN, action: 'update', rowIndex: editingRowIndex, row: row }
       : { pin: PIN, action: 'add', row: row };
 
-    statusEl.textContent = 'Saving… 儲存中…';
     fetch(API_URL, { method: 'POST', body: JSON.stringify(body) })
       .then(res => res.text())
       .then(text => {

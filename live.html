@@ -277,10 +277,23 @@
     color: var(--cyan);
     border-color: var(--cyan);
     background: rgba(70, 212, 222, 0.08);
-    transition: transform 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+  .live-intro-actions .btn:hover,
+  .live-intro-actions .btn:active{
+    background: rgba(70, 212, 222, 0.16);
+    animation: introBtnGlow 1s ease-in-out infinite;
   }
   .live-intro-actions .btn:active{
     transform: scale(0.93);
+  }
+  @keyframes introBtnGlow{
+    0%, 100% { box-shadow: 0 0 8px rgba(70, 212, 222, 0.45), 0 0 2px rgba(70, 212, 222, 0.6); }
+    50% { box-shadow: 0 0 22px rgba(70, 212, 222, 0.9), 0 0 8px rgba(70, 212, 222, 0.8); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .live-intro-actions .btn:hover,
+    .live-intro-actions .btn:active{ animation: none; box-shadow: 0 0 12px rgba(70, 212, 222, 0.7); }
   }
   .live-intro-actions .btn svg{
     width: 32px;
@@ -521,8 +534,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M18 6h-3V3"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>
             <span class="btn__label">Bulletin<br>週刊</span>
           </button>
-          <!-- TODO: replace with the real Zoom meeting link -->
-          <a href="YOUR_ZOOM_LINK_HERE" target="_blank" rel="noopener" class="btn btn--ghost" id="introTranslationBtn">
+          <a href="https://zoom.us/j/881620079" target="_blank" rel="noopener" class="btn btn--ghost" id="introTranslationBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 6 4 9s-1.5 6.5-4 9c-2.5-2.5-4-6-4-9s1.5-6.5 4-9z"/></svg>
             <span class="btn__label">Zoom Meeting<br>網聚</span>
           </a>
@@ -590,7 +602,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.67 · updated 2026-09-16</p>
+  <p class="live-version">v1.69 · updated 2026-09-16</p>
 </div>
 
 <script>

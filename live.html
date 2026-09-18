@@ -591,7 +591,7 @@
         </div>
         <div class="live-card">
           <h3>Venmo</h3>
-          <p><a href="https://venmo.com/SFCFC-CityMission" target="_blank" rel="noopener">@SFCFC-CityMission</a></p>
+          <p><a href="https://venmo.com/SFCFC-CityMission" onclick="return openVenmoApp(event)">@SFCFC-CityMission</a></p>
         </div>
         <div class="live-card">
           <h3>Zelle</h3>
@@ -626,7 +626,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.73 · updated 2026-09-16</p>
+  <p class="live-version">v1.74 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -668,6 +668,22 @@
 
   const introDonationBtn = document.getElementById('introDonationBtn');
   if (introDonationBtn) introDonationBtn.addEventListener('click', () => goTo(3));
+
+  // --- Venmo: try opening the app first, fall back to the website if it's not installed ---
+  window.openVenmoApp = function(e) {
+    e.preventDefault();
+    const fallbackUrl = 'https://venmo.com/SFCFC-CityMission';
+    const appUrl = 'venmo://users/SFCFC-CityMission';
+    const clickedAt = Date.now();
+    window.location.href = appUrl;
+    setTimeout(() => {
+      // If we're still here after ~1.5s, the app likely isn't installed — go to the site instead.
+      if (Date.now() - clickedAt < 2200 && !document.hidden) {
+        window.location.href = fallbackUrl;
+      }
+    }, 1500);
+    return false;
+  };
 
   // --- Arrange the 3 main buttons by day of week (Pacific Time) ---
   // Sunday: Direction / Bulletin / Donation up front, Event / Translation / Devotion under "More"

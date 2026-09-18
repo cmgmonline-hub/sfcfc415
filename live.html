@@ -597,7 +597,9 @@
         </div>
         <div class="live-card">
           <h3>Zelle</h3>
-          <p>info@cmgm.org</p>
+          <div class="live-actions">
+            <button type="button" class="btn btn--ghost" id="zelleCopyBtn" onclick="copyZelle()">info@cmgm.org</button>
+          </div>
         </div>
         <div class="live-card">
           <h3>Check <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">支票</span></h3>
@@ -627,7 +629,7 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.76 · updated 2026-09-16</p>
+  <p class="live-version">v1.77 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -684,6 +686,32 @@
       }
     }, 1500);
     return false;
+  };
+
+  // --- Zelle: copy the email to the clipboard so it can be pasted into the Zelle app ---
+  window.copyZelle = function() {
+    const email = 'info@cmgm.org';
+    const btn = document.getElementById('zelleCopyBtn');
+    const original = btn.textContent;
+    const showCopied = () => {
+      btn.textContent = 'Copied ✓ 已複製';
+      setTimeout(() => { btn.textContent = original; }, 2000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(email).then(showCopied).catch(() => {
+        btn.textContent = 'Copy failed 複製失敗';
+        setTimeout(() => { btn.textContent = original; }, 2000);
+      });
+    } else {
+      // Fallback for older browsers without the Clipboard API
+      const temp = document.createElement('textarea');
+      temp.value = email;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      showCopied();
+    }
   };
 
   // --- Arrange the 3 main buttons by day of week (Pacific Time) ---

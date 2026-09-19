@@ -201,8 +201,38 @@
 
     <div id="status"></div>
     <div id="list"></div>
+
+    <hr style="border-color: var(--line); margin: 32px 0;">
+
+    <h1>Church Stats 教會數據</h1>
+    <p class="subtitle">這幾個欄位會顯示在 live.html 的「Church Stats」頁。</p>
+    <div class="row2">
+      <div class="field"><label>Prayer Meeting 禱告</label><input type="number" id="s_prayer"></div>
+      <div class="field"><label>Children 兒崇</label><input type="number" id="s_children"></div>
+    </div>
+    <div class="field"><label>Adult 成人</label><input type="number" id="s_adult"></div>
+    <div class="row2">
+      <div class="field"><label>上週十一奉獻及堂費 ($)</label><input type="number" id="s_offeringLastWeek"></div>
+      <div class="field"><label>上週特別奉獻 ($)</label><input type="number" id="s_offeringSpecial"></div>
+    </div>
+    <div class="field"><label>本月奉獻總金額 ($)</label><input type="number" id="s_offeringMonthTotal"></div>
+    <div class="field"><label>2026 每月奉獻目標 ($)</label><input type="number" id="s_monthlyGoal"></div>
+    <div class="field"><label>目標明細（文字）</label><input type="text" id="s_monthlyGoalBreakdown" placeholder="租金$2,000 薪金$7,350 事工支出$1,600"></div>
+    <div class="row2">
+      <div class="field"><label>本月支出金額 ($)</label><input type="number" id="s_monthExpense"></div>
+      <div class="field"><label>目標差額 ($)</label><input type="number" id="s_monthGoalGap"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>銀行現存儲備（文字）</label><input type="text" id="s_bankReservePercent" placeholder="約 8%"></div>
+      <div class="field"><label>儲備備註（文字）</label><input type="text" id="s_bankReserveNote" placeholder="以9月份支出預算比例計算"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn2" id="statsSaveBtn">Save Stats 儲存數據</button>
+    </div>
+    <p id="statsStatus"></p>
+
   </div>
-  <p class="admin-version">v1.5 · updated 2026-09-16</p>
+  <p class="admin-version">v1.6 · updated 2026-09-16</p>
 
 <script>
   // TODO: this is your Apps Script Web App URL from the deployment step
@@ -261,6 +291,7 @@
     pinGate.style.display = 'none';
     app.style.display = 'block';
     loadList();
+    loadStats();
   }
 
   hasHeaderToggle.addEventListener('change', renderList);
@@ -471,6 +502,52 @@
       })
       .catch(() => { statusEl.textContent = 'Delete failed. 刪除失敗。'; });
   }
+
+  // --- Church Stats ---
+  const statsFieldIds = [
+    's_prayer', 's_children', 's_adult',
+    's_offeringLastWeek', 's_offeringSpecial', 's_offeringMonthTotal',
+    's_monthlyGoal', 's_monthlyGoalBreakdown',
+    's_monthExpense', 's_monthGoalGap',
+    's_bankReservePercent', 's_bankReserveNote'
+  ];
+  const statsStatusEl = document.getElementById('statsStatus');
+
+  function loadStats() {
+    statsStatusEl.textContent = 'Loading… 載入中…';
+    fetch(`${API_URL}?action=stats`)
+      .then(res => res.text())
+      .then(text => {
+        let data;
+        try { data = JSON.parse(text); }
+        catch (e) { statsStatusEl.textContent = 'Load failed — server said: ' + text.slice(0, 200); return; }
+        if (data.error) { statsStatusEl.textContent = 'Load failed: ' + data.error; return; }
+        statsFieldIds.forEach((id, i) => {
+          document.getElementById(id).value = (data[i] != null) ? data[i] : '';
+        });
+        statsStatusEl.textContent = '';
+      })
+      .catch(err => { statsStatusEl.textContent = 'Load failed (network): ' + err.message; });
+  }
+
+  document.getElementById('statsSaveBtn').addEventListener('click', () => {
+    const row = statsFieldIds.map(id => {
+      const el = document.getElementById(id);
+      return el.type === 'number' ? (el.value === '' ? '' : Number(el.value)) : el.value;
+    });
+    statsStatusEl.textContent = 'Saving… 儲存中…';
+    fetch(API_URL, { method: 'POST', body: JSON.stringify({ pin: PIN, action: 'updateStats', row: row }) })
+      .then(res => res.text())
+      .then(text => {
+        let data;
+        try { data = JSON.parse(text); }
+        catch (e) { statsStatusEl.textContent = 'Save failed — server said: ' + text.slice(0, 200); return; }
+        if (data.error) { statsStatusEl.textContent = 'Save failed: ' + data.error; return; }
+        statsStatusEl.textContent = 'Saved ✓ 已儲存';
+        setTimeout(() => { statsStatusEl.textContent = ''; }, 2000);
+      })
+      .catch(err => { statsStatusEl.textContent = 'Save failed (network): ' + err.message; });
+  });
 </script>
 </body>
 </html>

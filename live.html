@@ -608,7 +608,56 @@
       </div>
     </section>
 
-    <!-- Slide 4: Donation -->
+    <!-- Slide 4: Church Stats -->
+    <section class="live-slide live-slide--scroll">
+      <div class="live-slide__inner">
+        <p class="section-label section-label--center">Church Stats 教會數據</p>
+
+        <div class="live-card">
+          <h3>Attendance <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">上週主日出席人數</span></h3>
+          <p>
+            Prayer Meeting 禱告: <span id="statPrayer">--</span><br>
+            Children 兒崇: <span id="statChildren">--</span><br>
+            Adult 成人: <span id="statAdult">--</span><br>
+            <strong>Total 總: <span id="statTotal">--</span></strong>
+          </p>
+        </div>
+
+        <div class="live-card">
+          <h3>Offering <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">奉獻</span></h3>
+          <p>
+            上週十一奉獻及堂費: $<span id="statOfferingLastWeek">--</span><br>
+            上週特別奉獻: $<span id="statOfferingSpecial">--</span><br>
+            本月奉獻總金額: $<span id="statOfferingMonthTotal">--</span>
+          </p>
+        </div>
+
+        <div class="live-card">
+          <h3>2026 Monthly Giving Goal <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">2026 每月奉獻目標</span></h3>
+          <p>
+            $<span id="statMonthlyGoal">--</span><br>
+            <span style="opacity:0.8;" id="statMonthlyGoalBreakdown"></span>
+          </p>
+        </div>
+
+        <div class="live-card">
+          <h3>本月支出金額</h3>
+          <p>$<span id="statMonthExpense">--</span></p>
+        </div>
+
+        <div class="live-card">
+          <h3>目標差額</h3>
+          <p>$<span id="statMonthGoalGap">--</span></p>
+        </div>
+
+        <div class="live-card">
+          <h3>銀行現存儲備</h3>
+          <p><span id="statBankReservePercent">--</span><br><span style="opacity:0.8;" id="statBankReserveNote"></span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 5: Donation -->
     <section class="live-slide live-slide--scroll">
       <div class="live-slide__inner">
         <p class="section-label section-label--center">Donation 奉獻</p>
@@ -635,7 +684,7 @@
       </div>
     </section>
 
-    <!-- Slide 5: Connect -->
+    <!-- Slide 6: Connect -->
     <section class="live-slide">
       <div class="live-slide__inner">
         <p class="section-label section-label--center">Connect 聯絡我們</p>
@@ -655,7 +704,7 @@
     <div class="live-dots" id="dots"></div>
   </div>
   <p class="live-pageviews" id="livePageViews">Page Views 瀏覽次數: --</p>
-  <p class="live-version">v1.87 · updated 2026-09-16</p>
+  <p class="live-version">v1.89 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -696,7 +745,7 @@
   if (introEventBtn) introEventBtn.addEventListener('click', () => goTo(2));
 
   const introDonationBtn = document.getElementById('introDonationBtn');
-  if (introDonationBtn) introDonationBtn.addEventListener('click', () => goTo(3));
+  if (introDonationBtn) introDonationBtn.addEventListener('click', () => goTo(4));
 
   // --- Venmo: try opening the app first, fall back to the website if it's not installed ---
   window.openVenmoApp = function(e) {
@@ -754,6 +803,45 @@
       })
       .catch(() => { pageViewsEl.style.display = 'none'; });
   }
+
+  // --- Church Stats, via our own Apps Script backend (editable in admin.html) ---
+  (() => {
+    const statTotalEl = document.getElementById('statTotal');
+    if (!statTotalEl) return; // this slide isn't on the page
+    const STATS_URL = 'https://script.google.com/macros/s/AKfycbw6rT3UY-YmyxVY3g7hVOhpV3nQz8OT1NrJyac7VNRHywvt0xsd8FH0-tBo376zIYxB/exec';
+    const fmt = n => (typeof n === 'number') ? n.toLocaleString() : (n || '--');
+    const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+    fetch(`${STATS_URL}?action=stats`)
+      .then(res => res.json())
+      .then(row => {
+        if (!row || row.error) return;
+        const [prayer, children, adult, offeringLastWeek, offeringSpecial, offeringMonthTotal,
+               monthlyGoal, monthlyGoalBreakdown, monthExpense, monthGoalGap,
+               bankReservePercent, bankReserveNote] = row;
+
+        setText('statPrayer', fmt(prayer));
+        setText('statChildren', fmt(children));
+        setText('statAdult', fmt(adult));
+        const total = [prayer, children, adult].every(n => typeof n === 'number')
+          ? prayer + children + adult : '--';
+        setText('statTotal', fmt(total));
+
+        setText('statOfferingLastWeek', fmt(offeringLastWeek));
+        setText('statOfferingSpecial', fmt(offeringSpecial));
+        setText('statOfferingMonthTotal', fmt(offeringMonthTotal));
+
+        setText('statMonthlyGoal', fmt(monthlyGoal));
+        setText('statMonthlyGoalBreakdown', monthlyGoalBreakdown || '');
+
+        setText('statMonthExpense', fmt(monthExpense));
+        setText('statMonthGoalGap', fmt(monthGoalGap));
+
+        setText('statBankReservePercent', bankReservePercent || '--');
+        setText('statBankReserveNote', bankReserveNote || '');
+      })
+      .catch(() => { /* leave the "--" placeholders in place */ });
+  })();
 
   // --- Arrange the 3 main buttons by day of week (Pacific Time) ---
   // Sunday: Direction / Bulletin / Donation up front, Event / Translation / Devotion under "More"

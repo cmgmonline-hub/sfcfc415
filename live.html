@@ -516,6 +516,62 @@
     opacity: 0.6;
     margin: 0 0 4px;
   }
+  .stat-bubbles{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .stat-bubble{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    border: 1px solid var(--cyan);
+    background: rgba(70, 212, 222, 0.08);
+    animation: statBubbleGlow 2.6s ease-in-out infinite;
+  }
+  .stat-bubble:nth-child(2){ animation-delay: 0.4s; }
+  .stat-bubble:nth-child(3){ animation-delay: 0.8s; }
+  .stat-bubble:nth-child(4){ animation-delay: 1.2s; }
+  .stat-bubble--total{
+    border-color: var(--gold);
+    background: rgba(232, 182, 77, 0.1);
+  }
+  .stat-bubble--total .stat-bubble__num{ color: var(--gold); }
+  .stat-bubble__num{
+    font-family: var(--font-mono);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--cyan);
+    line-height: 1;
+  }
+  .stat-bubble__label{
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    text-align: center;
+    line-height: 1.2;
+    margin-top: 3px;
+  }
+  @keyframes statBubbleGlow{
+    0%, 100% { box-shadow: 0 0 6px rgba(70, 212, 222, 0.35); }
+    50% { box-shadow: 0 0 18px rgba(70, 212, 222, 0.8); }
+  }
+  .stat-bubble--total{ animation-name: statBubbleGlowGold; }
+  @keyframes statBubbleGlowGold{
+    0%, 100% { box-shadow: 0 0 6px rgba(232, 182, 77, 0.35); }
+    50% { box-shadow: 0 0 18px rgba(232, 182, 77, 0.8); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .stat-bubble{ animation: none; }
+  }
 </style>
 </head>
 <body>
@@ -615,12 +671,24 @@
 
         <div class="live-card">
           <h3>Attendance <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">上週主日出席人數</span></h3>
-          <p>
-            Prayer Meeting 禱告: <span id="statPrayer">--</span><br>
-            Children 兒崇: <span id="statChildren">--</span><br>
-            Adult 成人: <span id="statAdult">--</span><br>
-            <strong>Total 總: <span id="statTotal">--</span></strong>
-          </p>
+          <div class="stat-bubbles">
+            <div class="stat-bubble">
+              <span class="stat-bubble__num" id="statPrayer">0</span>
+              <span class="stat-bubble__label">Prayer<br>禱告</span>
+            </div>
+            <div class="stat-bubble">
+              <span class="stat-bubble__num" id="statChildren">0</span>
+              <span class="stat-bubble__label">Children<br>兒崇</span>
+            </div>
+            <div class="stat-bubble">
+              <span class="stat-bubble__num" id="statAdult">0</span>
+              <span class="stat-bubble__label">Adult<br>成人</span>
+            </div>
+            <div class="stat-bubble stat-bubble--total">
+              <span class="stat-bubble__num" id="statTotal">0</span>
+              <span class="stat-bubble__label">Total<br>總</span>
+            </div>
+          </div>
         </div>
 
         <div id="statsLock" class="live-card">
@@ -716,7 +784,7 @@
     <div class="live-dots" id="dots"></div>
   </div>
   <p class="live-pageviews" id="livePageViews">Page Views 瀏覽次數: --</p>
-  <p class="live-version">v1.93 · updated 2026-09-16</p>
+  <p class="live-version">v1.94 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -830,14 +898,30 @@
 
     let statsRow = null;
 
+    // Animates a bubble's number counting up from 0 to its final value.
+    function countUp(id, target) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (typeof target !== 'number') { el.textContent = target; return; }
+      const duration = 900;
+      const start = performance.now();
+      const step = now => {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // ease-out
+        el.textContent = Math.round(target * eased).toLocaleString();
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
     function showAttendance(row) {
       const [prayer, children, adult] = row;
-      setText('statPrayer', fmt(prayer));
-      setText('statChildren', fmt(children));
-      setText('statAdult', fmt(adult));
+      countUp('statPrayer', prayer);
+      countUp('statChildren', children);
+      countUp('statAdult', adult);
       const total = [prayer, children, adult].every(n => typeof n === 'number')
         ? prayer + children + adult : '--';
-      setText('statTotal', fmt(total));
+      countUp('statTotal', total);
     }
 
     function showGatedStats(row) {

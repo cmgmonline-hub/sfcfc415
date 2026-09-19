@@ -491,6 +491,15 @@
     opacity: 0.6;
     margin: 0;
   }
+  .live-pageviews{
+    text-align:center;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.03em;
+    color: var(--ink-faint);
+    opacity: 0.6;
+    margin: 0 0 4px;
+  }
 </style>
 </head>
 <body>
@@ -626,7 +635,8 @@
   <div class="live-bottom">
     <div class="live-dots" id="dots"></div>
   </div>
-  <p class="live-version">v1.82 · updated 2026-09-16</p>
+  <p class="live-pageviews" id="livePageViews">Page Views 瀏覽次數: --</p>
+  <p class="live-version">v1.83 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -712,6 +722,17 @@
       showCopied();
     }
   };
+
+  // --- Page view counter (free, no-signup counter API — decorative, not exact analytics) ---
+  const pageViewsEl = document.getElementById('livePageViews');
+  if (pageViewsEl) {
+    fetch('https://api.countapi.xyz/hit/sfcfc415-citymission/live-page-views')
+      .then(res => res.json())
+      .then(data => {
+        pageViewsEl.textContent = `Page Views 瀏覽次數: ${data.value.toLocaleString()}`;
+      })
+      .catch(() => { pageViewsEl.style.display = 'none'; });
+  }
 
   // --- Arrange the 3 main buttons by day of week (Pacific Time) ---
   // Sunday: Direction / Bulletin / Donation up front, Event / Translation / Devotion under "More"

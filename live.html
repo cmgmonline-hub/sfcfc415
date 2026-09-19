@@ -636,7 +636,7 @@
     <div class="live-dots" id="dots"></div>
   </div>
   <p class="live-pageviews" id="livePageViews">Page Views 瀏覽次數: --</p>
-  <p class="live-version">v1.84 · updated 2026-09-16</p>
+  <p class="live-version">v1.85 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -854,10 +854,13 @@
           return [dateRaw, timeRaw].filter(Boolean).join(' ');
         };
 
-        // Drop past announcements, then sort what's left soonest-first.
-        // Rows with no date, or a date we can't parse, are always kept and sorted to the end.
+        // Drop announcements more than 6 days past their date, then sort what's
+        // left soonest-first. Rows with no date, or a date we can't parse, are
+        // always kept and sorted to the end.
         const now = new Date();
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const expiryCutoff = new Date(startOfToday);
+        expiryCutoff.setDate(expiryCutoff.getDate() - 6);
         const withDates = allRows.map(row => {
           const cells = row.c || [];
           const rawDate = (cells[2] && cells[2].v != null) ? cells[2].v : '';
@@ -865,7 +868,7 @@
           return { row, parsedDate: combineDateTime(rawDate, rawTime) };
         });
         const rows = withDates
-          .filter(r => !r.parsedDate || r.parsedDate >= startOfToday)
+          .filter(r => !r.parsedDate || r.parsedDate >= expiryCutoff)
           .sort((a, b) => {
             if (!a.parsedDate && !b.parsedDate) return 0;
             if (!a.parsedDate) return 1;

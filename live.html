@@ -516,6 +516,11 @@
     opacity: 0.6;
     margin: 0 0 4px;
   }
+  .live-card--glow{
+    border-color: var(--cyan);
+    background: rgba(70, 212, 222, 0.06);
+    box-shadow: 0 0 16px rgba(70, 212, 222, 0.25);
+  }
   .stat-bubbles{
     display: flex;
     flex-wrap: wrap;
@@ -669,24 +674,24 @@
       <div class="live-slide__inner">
         <p class="section-label section-label--center">Church Stats 教會數據</p>
 
-        <div class="live-card">
-          <h3>Attendance <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">上週主日出席人數</span></h3>
+        <div class="live-card live-card--glow">
+          <h3>Attendance</h3>
           <div class="stat-bubbles">
             <div class="stat-bubble">
               <span class="stat-bubble__num" id="statPrayer">0</span>
-              <span class="stat-bubble__label">Prayer<br>禱告</span>
+              <span class="stat-bubble__label">Prayer</span>
             </div>
             <div class="stat-bubble">
               <span class="stat-bubble__num" id="statChildren">0</span>
-              <span class="stat-bubble__label">Children<br>兒崇</span>
+              <span class="stat-bubble__label">Children</span>
             </div>
             <div class="stat-bubble">
               <span class="stat-bubble__num" id="statAdult">0</span>
-              <span class="stat-bubble__label">Adult<br>成人</span>
+              <span class="stat-bubble__label">Adult</span>
             </div>
             <div class="stat-bubble stat-bubble--total">
               <span class="stat-bubble__num" id="statTotal">0</span>
-              <span class="stat-bubble__label">Total<br>總</span>
+              <span class="stat-bubble__label">Total</span>
             </div>
           </div>
         </div>
@@ -784,7 +789,7 @@
     <div class="live-dots" id="dots"></div>
   </div>
   <p class="live-pageviews" id="livePageViews">Page Views 瀏覽次數: --</p>
-  <p class="live-version">v1.94 · updated 2026-09-16</p>
+  <p class="live-version">v1.95 · updated 2026-09-16</p>
 </div>
 
 <script>

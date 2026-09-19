@@ -613,6 +613,16 @@
       <div class="live-slide__inner">
         <p class="section-label section-label--center">Church Stats 教會數據</p>
 
+        <div class="live-card">
+          <h3>Attendance <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">上週主日出席人數</span></h3>
+          <p>
+            Prayer Meeting 禱告: <span id="statPrayer">--</span><br>
+            Children 兒崇: <span id="statChildren">--</span><br>
+            Adult 成人: <span id="statAdult">--</span><br>
+            <strong>Total 總: <span id="statTotal">--</span></strong>
+          </p>
+        </div>
+
         <div id="statsLock" class="live-card">
           <h3>🔒 Members Only <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">會員專區</span></h3>
           <p>Enter the member password to view church stats. 請輸入會員密碼以查看教會數據。</p>
@@ -624,16 +634,6 @@
         </div>
 
         <div id="statsContent" style="display:none;">
-          <div class="live-card">
-            <h3>Attendance <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">上週主日出席人數</span></h3>
-            <p>
-              Prayer Meeting 禱告: <span id="statPrayer">--</span><br>
-              Children 兒崇: <span id="statChildren">--</span><br>
-              Adult 成人: <span id="statAdult">--</span><br>
-              <strong>Total 總: <span id="statTotal">--</span></strong>
-            </p>
-          </div>
-
           <div class="live-card">
             <h3>Offering <span style="display:block;font-size:0.75em;opacity:0.7;font-family:'Noto Sans TC',sans-serif;font-weight:500;">奉獻</span></h3>
             <p>
@@ -716,7 +716,7 @@
     <div class="live-dots" id="dots"></div>
   </div>
   <p class="live-pageviews" id="livePageViews">Page Views 瀏覽次數: --</p>
-  <p class="live-version">v1.91 · updated 2026-09-16</p>
+  <p class="live-version">v1.93 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -816,8 +816,9 @@
       .catch(() => { pageViewsEl.style.display = 'none'; });
   }
 
-  // --- Church Stats: password-gated (soft gate only — this is a static site with
-  // no real login, so this just deters casual browsing, not determined access) ---
+  // --- Church Stats: Attendance is public; Offering onward is password-gated
+  // (soft gate only — this is a static site with no real login, so this just
+  // deters casual browsing, not determined access) ---
   (() => {
     const statTotalEl = document.getElementById('statTotal');
     if (!statTotalEl) return; // this slide isn't on the page
@@ -827,37 +828,49 @@
     const fmt = n => (typeof n === 'number') ? n.toLocaleString() : (n || '--');
     const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
-    function loadStats() {
-      fetch(`${STATS_URL}?action=stats`)
-        .then(res => res.json())
-        .then(row => {
-          if (!row || row.error) return;
-          const [prayer, children, adult, offeringLastWeek, offeringSpecial, offeringMonthTotal,
-                 monthlyGoal, monthlyGoalBreakdown, monthExpense, monthGoalGap,
-                 bankReservePercent, bankReserveNote] = row;
+    let statsRow = null;
 
-          setText('statPrayer', fmt(prayer));
-          setText('statChildren', fmt(children));
-          setText('statAdult', fmt(adult));
-          const total = [prayer, children, adult].every(n => typeof n === 'number')
-            ? prayer + children + adult : '--';
-          setText('statTotal', fmt(total));
-
-          setText('statOfferingLastWeek', fmt(offeringLastWeek));
-          setText('statOfferingSpecial', fmt(offeringSpecial));
-          setText('statOfferingMonthTotal', fmt(offeringMonthTotal));
-
-          setText('statMonthlyGoal', fmt(monthlyGoal));
-          setText('statMonthlyGoalBreakdown', monthlyGoalBreakdown || '');
-
-          setText('statMonthExpense', fmt(monthExpense));
-          setText('statMonthGoalGap', fmt(monthGoalGap));
-
-          setText('statBankReservePercent', bankReservePercent || '--');
-          setText('statBankReserveNote', bankReserveNote || '');
-        })
-        .catch(() => { /* leave the "--" placeholders in place */ });
+    function showAttendance(row) {
+      const [prayer, children, adult] = row;
+      setText('statPrayer', fmt(prayer));
+      setText('statChildren', fmt(children));
+      setText('statAdult', fmt(adult));
+      const total = [prayer, children, adult].every(n => typeof n === 'number')
+        ? prayer + children + adult : '--';
+      setText('statTotal', fmt(total));
     }
+
+    function showGatedStats(row) {
+      const [, , , offeringLastWeek, offeringSpecial, offeringMonthTotal,
+             monthlyGoal, monthlyGoalBreakdown, monthExpense, monthGoalGap,
+             bankReservePercent, bankReserveNote] = row;
+
+      setText('statOfferingLastWeek', fmt(offeringLastWeek));
+      setText('statOfferingSpecial', fmt(offeringSpecial));
+      setText('statOfferingMonthTotal', fmt(offeringMonthTotal));
+
+      setText('statMonthlyGoal', fmt(monthlyGoal));
+      setText('statMonthlyGoalBreakdown', monthlyGoalBreakdown || '');
+
+      setText('statMonthExpense', fmt(monthExpense));
+      setText('statMonthGoalGap', fmt(monthGoalGap));
+
+      const bankDisplay = bankReservePercent
+        ? (String(bankReservePercent).includes('%') ? bankReservePercent : `${bankReservePercent}%`)
+        : '--';
+      setText('statBankReservePercent', bankDisplay);
+      setText('statBankReserveNote', bankReserveNote || '');
+    }
+
+    // Attendance loads right away, for everyone.
+    fetch(`${STATS_URL}?action=stats`)
+      .then(res => res.json())
+      .then(row => {
+        if (!row || row.error) return;
+        statsRow = row;
+        showAttendance(row);
+      })
+      .catch(() => { /* leave the "--" placeholders in place */ });
 
     function tryUnlock() {
       const input = document.getElementById('statsPasswordInput');
@@ -865,7 +878,7 @@
       if (input.value === MEMBER_PASSWORD) {
         document.getElementById('statsLock').style.display = 'none';
         document.getElementById('statsContent').style.display = 'block';
-        loadStats();
+        if (statsRow) showGatedStats(statsRow);
       } else {
         errorEl.textContent = 'Incorrect password 密碼錯誤';
       }

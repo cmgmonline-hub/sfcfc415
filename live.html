@@ -636,7 +636,7 @@
     <div class="live-dots" id="dots"></div>
   </div>
   <p class="live-pageviews" id="livePageViews">Page Views 瀏覽次數: --</p>
-  <p class="live-version">v1.83 · updated 2026-09-16</p>
+  <p class="live-version">v1.84 · updated 2026-09-16</p>
 </div>
 
 <script>
@@ -723,13 +723,15 @@
     }
   };
 
-  // --- Page view counter (free, no-signup counter API — decorative, not exact analytics) ---
+  // --- Page view counter, via our own Apps Script backend (same one behind admin.html) ---
   const pageViewsEl = document.getElementById('livePageViews');
   if (pageViewsEl) {
-    fetch('https://api.countapi.xyz/hit/sfcfc415-citymission/live-page-views')
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw6rT3UY-YmyxVY3g7hVOhpV3nQz8OT1NrJyac7VNRHywvt0xsd8FH0-tBo376zIYxB/exec';
+    fetch(`${APPS_SCRIPT_URL}?action=pageview&page=live`)
       .then(res => res.json())
       .then(data => {
-        pageViewsEl.textContent = `Page Views 瀏覽次數: ${data.value.toLocaleString()}`;
+        if (data.error) { pageViewsEl.style.display = 'none'; return; }
+        pageViewsEl.textContent = `Page Views 瀏覽次數: ${data.views.toLocaleString()}`;
       })
       .catch(() => { pageViewsEl.style.display = 'none'; });
   }

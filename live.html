@@ -16,7 +16,7 @@
 <style>
   /* live.html — swipeable single-screen slides, mobile-first */
   html, body{ height:100%; overflow:hidden; overscroll-behavior: none; }
-  body{ display:flex; flex-direction:column; }
+  body{ display:flex; flex-direction:column; touch-action: pan-y; }
 
   .live-shell{
     flex: 1;
@@ -36,6 +36,7 @@
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     overscroll-behavior-x: contain;
+    touch-action: pan-x;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
@@ -636,7 +637,7 @@
     <div class="live-dots" id="dots"></div>
   </div>
   <p class="live-pageviews" id="livePageViews">Page Views 瀏覽次數: --</p>
-  <p class="live-version">v1.85 · updated 2026-09-16</p>
+  <p class="live-version">v1.86 · updated 2026-09-16</p>
 </div>
 
 <script>

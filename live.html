@@ -26,6 +26,21 @@
     position:relative;
   }
 
+  /* Thin dead-zones along the very screen edges: touches starting here do
+     nothing (no scroll, no navigation) instead of letting iOS Safari mistake
+     them for its edge-swipe "go back" gesture. Real swipes almost never
+     start in this last sliver, so it doesn't get in the way of normal use. */
+  .live-edge-guard{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 18px;
+    z-index: 50;
+    touch-action: none;
+  }
+  .live-edge-guard--left{ left: 0; }
+  .live-edge-guard--right{ right: 0; }
+
   .live-track{
     flex:1;
     min-height: 0;
@@ -509,6 +524,9 @@
 
 <div class="live-shell">
 
+  <div class="live-edge-guard live-edge-guard--left"></div>
+  <div class="live-edge-guard live-edge-guard--right"></div>
+
   <button class="live-arrow live-arrow--prev is-hidden" id="prevBtn" aria-label="Previous">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M18 18l-6-6 6-6"/>
@@ -637,7 +655,7 @@
     <div class="live-dots" id="dots"></div>
   </div>
   <p class="live-pageviews" id="livePageViews">Page Views 瀏覽次數: --</p>
-  <p class="live-version">v1.86 · updated 2026-09-16</p>
+  <p class="live-version">v1.87 · updated 2026-09-16</p>
 </div>
 
 <script>
